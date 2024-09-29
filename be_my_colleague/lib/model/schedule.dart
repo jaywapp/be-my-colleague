@@ -8,7 +8,8 @@ class Schedule {
   DateTime dateTime = new DateTime(1000, 1, 1, 0, 0, 0, 0, 0);
   List<String> participantMails = [];
 
-  Schedule(String name, String description, String location, DateTime dateTime, List<String> participantMails) {
+  Schedule(String name, String description, String location, DateTime dateTime,
+      List<String> participantMails) {
     this.name = name;
     this.description = description;
     this.location = location;
