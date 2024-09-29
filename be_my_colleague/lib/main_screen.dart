@@ -1,3 +1,8 @@
+import 'package:be_my_colleague/model/Member.dart';
+import 'package:be_my_colleague/model/account.dart';
+import 'package:be_my_colleague/model/club.dart';
+import 'package:be_my_colleague/model/enums.dart';
+import 'package:be_my_colleague/model/schedule.dart';
 import 'package:flutter/material.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -20,88 +25,101 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _bottomItemIndex = 0;
+  Account _account = new Account('', '', []);
+  Club _selectedClub = new Club('', '', '', new DateTime(2011, 08, 16), [], []);
+
+  void changeClub(Club club) {
+    setState(() {
+      _selectedClub = club;
+    });
+    Navigator.pop(context); // Drawer 닫기
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Sample datas ----------------------------------
+    List<Member> members = [
+      new Member(
+          '박준영', 'jaywapp16@gmail.com', '01076549816', Permission.president),
+      new Member(
+          '김총무', 'satgot@gmail.com', '01012345678', Permission.secretary),
+      new Member('홍회원', 'gildon@gmail.com', '01056781234', Permission.normal),
+    ];
+
+    List<String> participants = ['jaywapp16@gmail.com', 'satgot@gmail.com'];
+
+    List<Schedule> schedules = [
+      new Schedule('정규일정', '정규일정 입니다.', '세븐축구클럽', new DateTime(2024, 09, 29),
+          participants)
+    ];
+
+    List<Club> clubs = [
+      new Club('1234', '경충FC', '풋살을 즐겁게 하자', new DateTime(2011, 08, 16),
+          members, schedules)
+    ];
+
+    _account = new Account("박준영", "jaywapp16@gmail.com", clubs);
+
+    // Sample datas --------------------------------
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(widget.title),
+        title: Text(_selectedClub.name),
         actions: [
-          IconButton(icon: Icon(Icons.account_box_rounded), onPressed: null),          
+          IconButton(icon: Icon(Icons.account_box_rounded), onPressed: null),
         ],
       ),
-      drawer:Drawer(
-        child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              UserAccountsDrawerHeader(
-                accountName: Text(
-                  '홍길동',
-                  style: TextStyle(
-                    letterSpacing: 1.0,
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                accountEmail: Text(
-                  'Sample@email.com',
-                  style: TextStyle(
-                    letterSpacing: 0.7,
-                    fontSize: 15,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-                onDetailsPressed: () {
-                  print('Arrow will rotate after clicking');
-                },
-                decoration: BoxDecoration(
-                  color:  Theme.of(context).colorScheme.primary,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(40.0),
-                    bottomRight: Radius.circular(40.0),
-                  ),
-                ),
-              ),
-              ListTile(
-                leading: Icon(
-                  Icons.home,
-                  color: Colors.grey[850],
-                ),
-                title: Text('Home'),
-                onTap: () {
-                  print('Home is clicked');
-                },
-                trailing: Icon(Icons.add),
-              ),
-              ListTile(
-                leading: Icon(
-                  Icons.settings,
-                  color: Colors.grey[850],
-                ),
-                title: Text('Setting'),
-                onTap: () {
-                  print('Setting is clicked');
-                },
-                trailing: Icon(Icons.add),
-              ),
-              ListTile(
-                leading: Icon(
-                  Icons.question_answer,
-                  color: Colors.grey[850],
-                ),
-                title: Text('Q&A'),
-                onTap: () {
-                  print('Q&A is clicked');
-                },
-                trailing: Icon(Icons.add),
-              ),
-            ],
-          ),
-        ),
+      drawer: Drawer(
+        child: 
+            ListView.builder(
+                itemCount: _account.clubs.length + 1,
+                itemBuilder: (BuildContext ctx, int index) {
+                  if (index == 0) {
+                    return   UserAccountsDrawerHeader(
+                      accountName: Text(
+                        _account.name,
+                        style: TextStyle(
+                          letterSpacing: 1.0,
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      accountEmail: Text(
+                        _account.mailAddress,
+                        style: TextStyle(
+                          letterSpacing: 0.7,
+                          fontSize: 15,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary,
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(40.0),
+                          bottomRight: Radius.circular(40.0),
+                        ),
+                      ),
+                    );
+                  } 
+                  else {
+                    return ListTile(
+                      leading: Icon(
+                        Icons.home,
+                        color: Colors.grey[850],
+                      ),
+                      title: Text(_account.clubs[index-1].name),
+                      onTap: () {
+                        changeClub(_account.clubs[index-1]);
+                      },
+                    );
+                  }
+                }),
+      
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
-           BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(Icons.home_filled),
             label: '홈',
           ),
