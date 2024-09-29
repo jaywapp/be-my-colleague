@@ -17,46 +17,120 @@ class MyHomePage extends StatefulWidget {
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+class _MyHomePageState extends State<MyHomePage> {
+  int _bottomItemIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        centerTitle: true,
         title: Text(widget.title),
+        actions: [
+          IconButton(icon: Icon(Icons.account_box_rounded), onPressed: null),          
+        ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+      drawer:Drawer(
+        child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              UserAccountsDrawerHeader(
+                accountName: Text(
+                  '홍길동',
+                  style: TextStyle(
+                    letterSpacing: 1.0,
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                accountEmail: Text(
+                  'Sample@email.com',
+                  style: TextStyle(
+                    letterSpacing: 0.7,
+                    fontSize: 15,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+                onDetailsPressed: () {
+                  print('Arrow will rotate after clicking');
+                },
+                decoration: BoxDecoration(
+                  color:  Theme.of(context).colorScheme.primary,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(40.0),
+                    bottomRight: Radius.circular(40.0),
+                  ),
+                ),
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.home,
+                  color: Colors.grey[850],
+                ),
+                title: Text('Home'),
+                onTap: () {
+                  print('Home is clicked');
+                },
+                trailing: Icon(Icons.add),
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.settings,
+                  color: Colors.grey[850],
+                ),
+                title: Text('Setting'),
+                onTap: () {
+                  print('Setting is clicked');
+                },
+                trailing: Icon(Icons.add),
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.question_answer,
+                  color: Colors.grey[850],
+                ),
+                title: Text('Q&A'),
+                onTap: () {
+                  print('Q&A is clicked');
+                },
+                trailing: Icon(Icons.add),
+              ),
+            ],
+          ),
         ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+           BottomNavigationBarItem(
+            icon: Icon(Icons.home_filled),
+            label: '홈',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.supervised_user_circle_sharp),
+            label: '회원정보',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_month),
+            label: '일정',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.attach_money),
+            label: '회비',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.more_horiz),
+            label: '더보기',
+          ),
+        ],
+        currentIndex: _bottomItemIndex,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor: Colors.black,
+        onTap: (int index) {
+          setState(() {
+            _bottomItemIndex = index;
+          });
+        },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
