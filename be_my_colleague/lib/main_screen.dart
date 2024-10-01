@@ -63,6 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _account = Load();
+    _selectedClub = _account.clubs.first;
   }
 
   Widget getScreen(int idx){
@@ -73,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
       return MembersScreen(_selectedClub);
     }
     else if(idx == 2){
-      return ScheduleScreen(_selectedClub);      
+      return ScheduleScreen(_account, _selectedClub);      
     }
     else if(idx == 3){
       return DuesScreen(_selectedClub);
