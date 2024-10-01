@@ -177,7 +177,7 @@ UserAccountsDrawerHeader CreateDrawerHeader(Account account){
     List<String> participants = ['jaywapp16@gmail.com', 'satgot@gmail.com'];
 
     List<Schedule> schedules = [
-      new Schedule('정규일정', '정규일정 입니다.', '세븐축구클럽','경기 광주시 오포로171번길 17-19', new DateTime(2024, 09, 29),
+      new Schedule('정규일정', '정규일정 입니다.', '경기 광주시 오포로171번길 17-19', new DateTime(2024, 09, 29),
           participants)
     ];
 

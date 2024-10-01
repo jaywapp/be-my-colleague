@@ -25,7 +25,7 @@ class ScheduleDetail extends StatefulWidget {
 
 class _ScheduleDetailState extends State<ScheduleDetail>{
   
-  Schedule _schedule = new Schedule('', '', '', '', new DateTime(1000, 00, 00), []);
+  Schedule _schedule = new Schedule('', '', '', new DateTime(1000, 00, 00), []);
   bool _include = false;
 
   String convert(DateTime now) {
@@ -62,8 +62,7 @@ class _ScheduleDetailState extends State<ScheduleDetail>{
                 CreateHeader(Icons.access_time, '언제'),
                 CreateContent(convert(_schedule.dateTime)),
                 CreateHeader(Icons.map_outlined, '어디서'),
-                CreateContent(_schedule.locationName),
-                CreateDescription(_schedule.location),
+                CreateContent(_schedule.location),
                 CreateMap(_schedule.location),
                 CreateHeader(Icons.supervised_user_circle, '누가'),
                 CreateParticipants(context, widget.account, members),
@@ -179,7 +178,7 @@ class _ScheduleDetailState extends State<ScheduleDetail>{
                     var marker = NMarker(id: '1', position: NLatLng(lat, lng));
 
                     controller.addOverlay(marker);
-                    final onMarkerInfoWindow = NInfoWindow.onMarker(id: marker.info.id, text: _schedule.locationName);
+                    final onMarkerInfoWindow = NInfoWindow.onMarker(id: marker.info.id, text: _schedule.location);
                     marker.openInfoWindow(onMarkerInfoWindow);
                   },
                 ));

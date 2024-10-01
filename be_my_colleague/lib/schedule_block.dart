@@ -61,7 +61,8 @@ class ScheduleBlock extends StatelessWidget {
                           ]),
                           Row(
                             children: [
-                              Text(schedule.locationName,
+                              Text(
+                                  schedule.location,
                                   style: TextStyle(
                                     fontSize: locationFontSize,
                                     fontWeight: locationFontWeight,
