@@ -1,9 +1,14 @@
+import 'dart:async';
+
+import 'package:be_my_colleague/Service/MapService.dart';
+import 'package:be_my_colleague/Styles.dart';
 import 'package:be_my_colleague/model/Member.dart';
 import 'package:be_my_colleague/model/account.dart';
 import 'package:be_my_colleague/model/club.dart';
 import 'package:be_my_colleague/model/schedule.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_naver_map/flutter_naver_map.dart';
 
 
 class ScheduleDetail extends StatefulWidget {
@@ -56,6 +61,8 @@ class _ScheduleDetailState extends State<ScheduleDetail>{
                 CreateHeader(Icons.access_time, '언제'),
                 CreateContent(convert(_schedule.dateTime)),
                 CreateHeader(Icons.map_outlined, '어디서'),
+                CreateContent(_schedule.location),
+                CreateMap(_schedule.location),
                 CreateHeader(Icons.supervised_user_circle, '누가'),
                 CreateParticipants(context, widget.account, members),
               ],
@@ -97,10 +104,6 @@ class _ScheduleDetailState extends State<ScheduleDetail>{
   }
 
   Padding CreateHeader(IconData iconData, String text) {
-    var style = TextStyle(
-      fontSize: 24,
-      fontWeight: FontWeight.bold,
-    );
 
     return Padding(
       padding: EdgeInsets.fromLTRB(5.0, 5.0, 0, 10.0),
@@ -110,27 +113,43 @@ class _ScheduleDetailState extends State<ScheduleDetail>{
             padding: EdgeInsets.fromLTRB(0, 5, 10, 0),
             child: Icon(iconData),
           ),
-          Text(text, style: style)
+          Text(text, style: Styles.HeaderStyle)
         ],
       ),
     );
   }
 
   Padding CreateContent(String text) {
-    var style = TextStyle(
-      fontSize: 24,
-    );
 
     return Padding(
       padding: EdgeInsets.fromLTRB(5.0, 5.0, 0, 10.0),
       child: Row(
-        children: [Text(text, style: style)],
+        children: [Text(text, style: Styles.ContentStyle)],
       ),
     );
   }
 
-  Widget CreateParticipants(BuildContext context, Account account,List<Member> members) {
+  Widget CreateMap(String location){
 
+    final Completer<NaverMapController> mapControllerCompleter = Completer();
+
+    return Flexible(
+      flex: 1,
+      child: NaverMap(
+          options: const NaverMapViewOptions(
+//            initialCameraPosition: NCameraPosition(target: NLatLng(latitude, longitude), zoom: 10),
+            indoorEnable: true,             // 실내 맵 사용 가능 여부 설정
+            locationButtonEnable: false,    // 위치 버튼 표시 여부 설정
+            consumeSymbolTapEvents: false,  // 심볼 탭 이벤트 소비 여부 설정
+            liteModeEnable: true
+          ),
+          onMapReady: (controller) async {                // 지도 준비 완료 시 호출되는 콜백 함수
+            mapControllerCompleter.complete(controller);  // Completer에 지도 컨트롤러 완료 신호 전송
+          },
+        ));
+  }
+
+  Widget CreateParticipants(BuildContext context, Account account,List<Member> members) {
 
     return  Expanded(
       child: ListView.builder(
