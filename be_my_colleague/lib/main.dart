@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(
             seedColor: Colors.blue,
             primary: Color.fromARGB(255, 7, 110, 245),
-            ),
+          ),
           useMaterial3: true,
         ),
         home: FutureBuilder(
