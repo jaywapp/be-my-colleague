@@ -9,4 +9,9 @@ class Styles {
   static TextStyle ContentStyle = TextStyle(
       fontSize: 16,
   );
+
+  static TextStyle DescriptionStyle = TextStyle(
+      fontSize: 13,
+      decorationColor: Colors.grey,
+  );
 }

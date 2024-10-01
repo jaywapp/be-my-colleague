@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:be_my_colleague/Service/MapService.dart';
 import 'package:be_my_colleague/Styles.dart';
@@ -24,7 +25,7 @@ class ScheduleDetail extends StatefulWidget {
 
 class _ScheduleDetailState extends State<ScheduleDetail>{
   
-  Schedule _schedule = new Schedule('', '', '', new DateTime(1000, 00, 00), []);
+  Schedule _schedule = new Schedule('', '', '', '', new DateTime(1000, 00, 00), []);
   bool _include = false;
 
   String convert(DateTime now) {
@@ -61,7 +62,8 @@ class _ScheduleDetailState extends State<ScheduleDetail>{
                 CreateHeader(Icons.access_time, '언제'),
                 CreateContent(convert(_schedule.dateTime)),
                 CreateHeader(Icons.map_outlined, '어디서'),
-                CreateContent(_schedule.location),
+                CreateContent(_schedule.locationName),
+                CreateDescription(_schedule.location),
                 CreateMap(_schedule.location),
                 CreateHeader(Icons.supervised_user_circle, '누가'),
                 CreateParticipants(context, widget.account, members),
@@ -129,24 +131,68 @@ class _ScheduleDetailState extends State<ScheduleDetail>{
     );
   }
 
+  Padding CreateDescription(String text) {
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(5.0, 0.0, 0, 10.0),
+      child: Row(
+        children: [Text(text, style: Styles.DescriptionStyle)],
+      ),
+    );
+  }
+
   Widget CreateMap(String location){
 
     final Completer<NaverMapController> mapControllerCompleter = Completer();
 
-    return Flexible(
-      flex: 1,
-      child: NaverMap(
-          options: const NaverMapViewOptions(
-//            initialCameraPosition: NCameraPosition(target: NLatLng(latitude, longitude), zoom: 10),
-            indoorEnable: true,             // 실내 맵 사용 가능 여부 설정
-            locationButtonEnable: false,    // 위치 버튼 표시 여부 설정
-            consumeSymbolTapEvents: false,  // 심볼 탭 이벤트 소비 여부 설정
-            liteModeEnable: true
-          ),
-          onMapReady: (controller) async {                // 지도 준비 완료 시 호출되는 콜백 함수
-            mapControllerCompleter.complete(controller);  // Completer에 지도 컨트롤러 완료 신호 전송
-          },
-        ));
+    return Container(
+      child: FutureBuilder(
+        future : MapService.getLatLngFromAddress(location),
+        builder : (context, snapshot)
+        {
+          if(snapshot.connectionState == ConnectionState.done){
+
+            var latStr = snapshot.data?.values?.elementAt(0) ?? 0;
+            var lngStr = snapshot.data?.values?.elementAt(1) ?? 0;
+
+            double lat = double.parse(latStr);
+            double lng = double.parse(lngStr);
+
+            return  Flexible(
+              flex: 1,
+              child: NaverMap(                  
+                  options: NaverMapViewOptions(
+                    initialCameraPosition: NCameraPosition(
+                      target: NLatLng(lat, lng),
+                      zoom: 15,
+                      bearing: 0,
+                      tilt: 0,
+                    ),
+                    indoorEnable: true,             // 실내 맵 사용 가능 여부 설정
+                    locationButtonEnable: false,    // 위치 버튼 표시 여부 설정
+                    consumeSymbolTapEvents: false,  // 심볼 탭 이벤트 소비 여부 설정
+                    liteModeEnable: true
+                  ),
+                  onMapReady: (controller) async {                // 지도 준비 완료 시 호출되는 콜백 함수
+                    mapControllerCompleter.complete(controller);  // Completer에 지도 컨트롤러 완료 신호 전송
+
+                    var marker = NMarker(id: '1', position: NLatLng(lat, lng));
+
+                    controller.addOverlay(marker);
+                    final onMarkerInfoWindow = NInfoWindow.onMarker(id: marker.info.id, text: _schedule.locationName);
+                    marker.openInfoWindow(onMarkerInfoWindow);
+                  },
+                ));
+            }
+          else{
+            return Flexible(
+              flex: 1,
+              child: Text('지도 로드에 실패하였습니다')
+              );
+          }
+        }
+      ),
+    );
   }
 
   Widget CreateParticipants(BuildContext context, Account account,List<Member> members) {
