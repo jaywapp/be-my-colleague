@@ -1,3 +1,4 @@
+import 'package:be_my_colleague/Styles.dart';
 import 'package:be_my_colleague/model/club.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -29,14 +30,7 @@ class MembersScreenState extends State<MembersScreen> {
               color: Colors.black, // 아이콘 색상
             ),
             SizedBox(width: 8), // 아이콘과 텍스트 사이의 간격
-            Text(
-              '회원정보',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
+            Text('회원정보', style: Styles.HeaderStyle,),
           ],
         ),
       ),
@@ -46,7 +40,7 @@ class MembersScreenState extends State<MembersScreen> {
           final member = club.members[index];
           return ListTile(
             leading: Icon(Icons.account_circle),
-            title: Text(member.name),
+            title: Text(member.name, style: Styles.ContentStyle),
             subtitle:
                 Text('등급: ${member.permission.toString().split('.').last}'),
             trailing: IconButton(
