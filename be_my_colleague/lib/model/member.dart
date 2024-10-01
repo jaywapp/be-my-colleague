@@ -7,14 +7,15 @@ class Member {
   String phoneNumber = '';
   Permission permission = Permission.normal;
 
-  Member(String name, String mailAddress, String phoneNumber, Permission permission) {
+  Member(String name, String mailAddress, String phoneNumber,
+      Permission permission) {
     this.name = name;
     this.mailAddress = mailAddress;
-    this.phoneNumber = phoneNumber;
+    this.phoneNumber = '+82${phoneNumber.substring(1)}';
     this.permission = permission;
   }
 
-   static Permission convert(String permission) {
+  static Permission convert(String permission) {
     switch (permission) {
       case 'president':
         return Permission.president;
