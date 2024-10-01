@@ -59,12 +59,12 @@ class _ScheduleDetailState extends State<ScheduleDetail>{
             padding: EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 12.0),
             child: Column(
               children: [
-                CreateHeader(Icons.access_time, '언제'),
-                CreateContent(convert(_schedule.dateTime)),
-                CreateHeader(Icons.map_outlined, '어디서'),
-                CreateContent(_schedule.location),
+                Styles.CreateHeader(Icons.access_time, '언제'),
+                Styles.CreateContent(convert(_schedule.dateTime)),
+                Styles.CreateHeader(Icons.map_outlined, '어디서'),
+                Styles.CreateContent(_schedule.location),
                 CreateMap(_schedule.location),
-                CreateHeader(Icons.supervised_user_circle, '누가'),
+                Styles.CreateHeader(Icons.supervised_user_circle, '누가'),
                 CreateParticipants(context, widget.account, members),
               ],
             ),
@@ -102,42 +102,6 @@ class _ScheduleDetailState extends State<ScheduleDetail>{
   void Attend(){
     // TODO : 서버에 데이터 추가 요청
     widget.schedule.participantMails.add(widget.account.mailAddress);
-  }
-
-  Padding CreateHeader(IconData iconData, String text) {
-
-    return Padding(
-      padding: EdgeInsets.fromLTRB(5.0, 5.0, 0, 10.0),
-      child: Row(
-        children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(0, 5, 10, 0),
-            child: Icon(iconData),
-          ),
-          Text(text, style: Styles.HeaderStyle)
-        ],
-      ),
-    );
-  }
-
-  Padding CreateContent(String text) {
-
-    return Padding(
-      padding: EdgeInsets.fromLTRB(5.0, 5.0, 0, 10.0),
-      child: Row(
-        children: [Text(text, style: Styles.ContentStyle)],
-      ),
-    );
-  }
-
-  Padding CreateDescription(String text) {
-
-    return Padding(
-      padding: EdgeInsets.fromLTRB(5.0, 0.0, 0, 10.0),
-      child: Row(
-        children: [Text(text, style: Styles.DescriptionStyle)],
-      ),
-    );
   }
 
   Widget CreateMap(String location){
