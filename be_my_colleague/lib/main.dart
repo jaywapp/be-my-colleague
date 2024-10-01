@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
         ),
         home: FutureBuilder(
           future: Future.delayed(
-              const Duration(seconds: 10), () => "Intro Completed."),
+              const Duration(seconds: 5), () => "Intro Completed."),
           builder: (context, snapshot) {
             return AnimatedSwitcher(
                 duration: const Duration(milliseconds: 1000),

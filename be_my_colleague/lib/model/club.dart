@@ -1,6 +1,5 @@
 import 'package:be_my_colleague/model/Member.dart';
 import 'package:be_my_colleague/model/schedule.dart';
-import 'package:flutter/material.dart';
 
 class Club {
   String spreadID = '';
