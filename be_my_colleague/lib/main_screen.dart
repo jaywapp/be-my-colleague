@@ -48,10 +48,11 @@ const _navItems = [
 
 class _MyHomePageState extends State<MyHomePage> {
   int _bottomItemIndex = 0;
-  Account _account = new Account('', '');
 
   List<Club> _clubs = [];
   Club _selectedClub = new Club('', '', '', new DateTime(2011, 08, 16));
+
+  DataCenter _dataCenter = new DataCenter('', '');
 
   void changeClub(Club club) {
     setState(() {
@@ -63,22 +64,23 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    _account = DataCenter.GetAccount();
-    _clubs = DataCenter.GetClubs(_account);
+
+    _dataCenter = new DataCenter('박준영', 'jaywapp16@gmail.com');
+    _clubs = _dataCenter.GetClubs();
     _selectedClub = _clubs.first;
   }
 
   Widget getScreen(int idx) {
     if (idx == 0) {
-      return HomeScreen(_account, _selectedClub.id);
+      return HomeScreen(_dataCenter, _selectedClub.id);
     } else if (idx == 1) {
-      return MembersScreen(_account, _selectedClub.id);
+      return MembersScreen(_dataCenter, _selectedClub.id);
     } else if (idx == 2) {
-      return ScheduleScreen(_account, _selectedClub.id);
+      return ScheduleScreen(_dataCenter, _selectedClub.id);
     } else if (idx == 3) {
-      return DuesScreen(_account, _selectedClub.id);
+      return DuesScreen(_dataCenter, _selectedClub.id);
     } else if (idx == 4) {
-      return MoreScreen(_account, _selectedClub.id);
+      return MoreScreen(_dataCenter, _selectedClub.id);
     } else {
       throw Exception('Unknown screen');
     }
@@ -100,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
             itemCount: _clubs.length + 1,
             itemBuilder: (BuildContext ctx, int index) {
               if (index == 0) {
-                return CreateDrawerHeader(_account);
+                return CreateDrawerHeader(_dataCenter.account);
               } else {
                 return ListTile(
                   leading: Icon(

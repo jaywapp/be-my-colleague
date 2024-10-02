@@ -8,11 +8,10 @@ import 'package:flutter/material.dart';
 
 class ScheduleScreen extends StatefulWidget {
 
-  // 불변
-  final Account account;
+  final DataCenter dataCenter;
   final String clubID;
 
-  const ScheduleScreen(this.account, this.clubID);
+  const ScheduleScreen(this.dataCenter, this.clubID);
 
   @override
   State<StatefulWidget> createState() => ScheduleScreenState();
@@ -30,7 +29,7 @@ class ScheduleScreenState extends State<ScheduleScreen> {
   @override
   void initState() {
     super.initState();
-    _schedules =  DataCenter.GetSchedules(widget.clubID);
+    _schedules =  widget.dataCenter.GetSchedules(widget.clubID);
   }
 
   @override
@@ -45,7 +44,7 @@ class ScheduleScreenState extends State<ScheduleScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => ScheduleDetail(
-                          account: widget.account,
+                          dataCenter: widget.dataCenter,
                           clubID: widget.clubID,
                           scheduleID: _schedules[index].id,
                         ),

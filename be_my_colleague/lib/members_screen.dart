@@ -6,10 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MembersScreen extends StatefulWidget {
-  final Account account;
+  
+  final DataCenter dataCenter;
   final String clubID;
 
-  const MembersScreen(this.account, this.clubID);
+  const MembersScreen(this.dataCenter, this.clubID);
 
   @override
   State<StatefulWidget> createState() => MembersScreenState();
@@ -18,10 +19,10 @@ class MembersScreen extends StatefulWidget {
 class MembersScreenState extends State<MembersScreen> {
   @override
   Widget build(BuildContext context) {
-    var club = DataCenter.GetClubs(widget.account).firstWhere((o) => o.id == widget.clubID);
+    var club = widget.dataCenter.GetClubs().firstWhere((o) => o.id == widget.clubID);
 
     // 멤버를 permission에 따라 정렬
-    var members = DataCenter.GetMembers(club.id);
+    var members = widget.dataCenter.GetMembers(club.id);
     
     members.sort((a, b) => b.permission.index.compareTo(a.permission.index));
 

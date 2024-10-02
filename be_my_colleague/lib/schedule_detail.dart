@@ -13,13 +13,13 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 
 class ScheduleDetail extends StatefulWidget {
-  final Account account;
+  final DataCenter dataCenter;
   final String clubID;
   final String scheduleID;
 
   const ScheduleDetail(
       {super.key,
-      required this.account,
+      required this.dataCenter,
       required this.clubID,
       required this.scheduleID});
 
@@ -33,8 +33,8 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
 
   void Load() {
     // 서버에서 최신 schedule 정보 로드
-    _schedule = DataCenter.GetSchedules(widget.clubID).firstWhere((o) => o.id == widget.scheduleID);
-    _include = _schedule.participantMails.contains(widget.account.mailAddress);
+    _schedule = widget.dataCenter.GetSchedules(widget.clubID).firstWhere((o) => o.id == widget.scheduleID);
+    _include = _schedule.participantMails.contains(widget.dataCenter.account.mailAddress);
   }
 
   @override
@@ -45,7 +45,7 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
 
   @override
   Widget build(BuildContext context) {
-    var members = DataCenter.GetMembers(widget.clubID)
+    var members = widget.dataCenter.GetMembers(widget.clubID)
         .where(
             (member) => _schedule.participantMails.contains(member.mailAddress))
         .toList();
@@ -62,7 +62,7 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
             Styles.CreateContent(_schedule.location),
             CreateMap(_schedule.location),
             Styles.CreateHeader(Icons.supervised_user_circle, '누가'),
-            CreateParticipants(context, widget.account, members),
+            CreateParticipants(context,  widget.dataCenter.account, members),
           ],
         ),
       ),
@@ -89,12 +89,12 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
 
   void Absent() {
     // TODO : 서버에 데이터 제거 요청
-    _schedule.participantMails.remove(widget.account.mailAddress);
+    _schedule.participantMails.remove(widget.dataCenter.account.mailAddress);
   }
 
   void Attend() {
     // TODO : 서버에 데이터 추가 요청
-    _schedule.participantMails.add(widget.account.mailAddress);
+    _schedule.participantMails.add(widget.dataCenter.account.mailAddress);
   }
 
   Widget CreateMap(String location) {

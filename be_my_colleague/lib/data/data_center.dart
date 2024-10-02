@@ -7,7 +7,13 @@ import 'package:flutter/material.dart';
 
 class DataCenter {
 
-  static List<Member> GetMembers(String clubID){
+  Account account = new Account('', '');
+
+  DataCenter(String name, String mailAddress){
+    account = new Account(name, mailAddress);
+  }
+
+  List<Member> GetMembers(String clubID){
 
      List<Member> members = [
       new Member('박준영', 'jaywapp16@gmail.com', '01076549816', Permission.president),
@@ -18,7 +24,7 @@ class DataCenter {
     return members;
   }
 
-  static List<Schedule> GetSchedules(String clubID){
+  List<Schedule> GetSchedules(String clubID){
 
     List<String> participants = ['jaywapp16@gmail.com', 'satgot@gmail.com'];
     List<Schedule> schedules = [
@@ -28,17 +34,12 @@ class DataCenter {
     return schedules;
   }
 
-  static List<Club> GetClubs(Account account){
+  List<Club> GetClubs(){
     
     List<Club> clubs = [
       new Club('1234', '경충FC', '풋살을 즐겁게 하자', new DateTime(2011, 08, 16))
     ];
 
     return clubs;
-  }
- 
-
-  static Account GetAccount() {
-    return new Account("박준영", "jaywapp16@gmail.com");
-  }
+  } 
 }
