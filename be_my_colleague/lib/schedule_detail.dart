@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:be_my_colleague/Service/MapService.dart';
 import 'package:be_my_colleague/Styles.dart';
 import 'package:be_my_colleague/data/data_center.dart';
-import 'package:be_my_colleague/model/Member.dart';
+import 'package:be_my_colleague/model/member.dart';
 import 'package:be_my_colleague/model/account.dart';
 import 'package:be_my_colleague/model/club.dart';
 import 'package:be_my_colleague/model/schedule.dart';

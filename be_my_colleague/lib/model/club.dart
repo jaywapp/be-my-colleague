@@ -6,11 +6,7 @@ class Club {
   String name = '';
   String description = '';  
   DateTime created = new DateTime(1000, 1, 1, 0, 0, 0, 0, 0);
+  int dueDay = 1;
 
-  Club(String id, String name, String description, DateTime created){
-    this.id = id;
-    this.name = name;
-    this.description = description;
-    this.created = created;
-  }
+  Club(this.id, this.name, this.description, this.created, this.dueDay);
 }

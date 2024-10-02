@@ -5,14 +5,11 @@ class Member {
   String name = '';
   String mailAddress = '';
   String phoneNumber = '';
+  DateTime birth = new DateTime(1000, 1, 1);
+  DateTime created = new DateTime(1000, 1, 1);
   Permission permission = Permission.normal;
 
-  Member(String name, String mailAddress, String phoneNumber, Permission permission) {
-    this.name = name;
-    this.mailAddress = mailAddress;
-    this.phoneNumber = '+82${phoneNumber.substring(1)}';
-    this.permission = permission;
-  }
+  Member(this.name, this.mailAddress, this.phoneNumber, this.birth, this.created, this.permission);
 
   static Permission convert(String permission) {
     switch (permission) {
