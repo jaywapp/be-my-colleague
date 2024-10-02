@@ -28,17 +28,7 @@ class MembersScreenState extends State<MembersScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Icon(
-              Icons.supervised_user_circle_sharp,
-              size: 30, // 아이콘 크기 조정
-              color: Colors.black, // 아이콘 색상
-            ),
-            SizedBox(width: 8), // 아이콘과 텍스트 사이의 간격
-            Text('회원정보', style: Styles.HeaderStyle,),
-          ],
-        ),
+        title: Styles.CreateHeader(Icons.supervised_user_circle_sharp, '회원정보'),
       ),
       body: ListView.builder(
         itemCount: members.length,
