@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ffi';
+import 'package:be_my_colleague/data/data_center.dart';
 import 'package:be_my_colleague/dues_screen.dart';
 import 'package:be_my_colleague/home_screen.dart';
 import 'package:be_my_colleague/members_screen.dart';
@@ -12,7 +13,6 @@ import 'package:be_my_colleague/more_screen.dart';
 import 'package:be_my_colleague/schedule_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle; // 로컬 assets를 읽기 위해 필요
-
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -47,9 +47,10 @@ const _navItems = [
 ];
 
 class _MyHomePageState extends State<MyHomePage> {
-  
   int _bottomItemIndex = 0;
   Account _account = new Account('', '', []);
+
+  List<Club> _clubs = [];
   Club _selectedClub = new Club('', '', '', new DateTime(2011, 08, 16), [], []);
 
   void changeClub(Club club) {
@@ -62,34 +63,29 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    _account = Load();
-    _selectedClub = _account.clubs.first;
+    _account = DataCenter.GetAccount();
+    _clubs = DataCenter.GetClubs(_account);
+    _selectedClub = _clubs.first;
   }
 
-  Widget getScreen(int idx){
-    if(idx == 0){
+  Widget getScreen(int idx) {
+    if (idx == 0) {
       return HomeScreen(_selectedClub);
-    }
-    else if(idx == 1){
-      return MembersScreen(_selectedClub);
-    }
-    else if(idx == 2){
-      return ScheduleScreen(_account, _selectedClub);      
-    }
-    else if(idx == 3){
+    } else if (idx == 1) {
+      return MembersScreen(_account, _selectedClub);
+    } else if (idx == 2) {
+      return ScheduleScreen(_account, _selectedClub);
+    } else if (idx == 3) {
       return DuesScreen(_selectedClub);
-    }
-    else if(idx == 4){
+    } else if (idx == 4) {
       return MoreScreen(_selectedClub);
-    }
-    else{
-        throw Exception('Unknown screen');
+    } else {
+      throw Exception('Unknown screen');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -98,29 +94,26 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(icon: Icon(Icons.account_box_rounded), onPressed: null),
         ],
       ),
-      body:  getScreen(_bottomItemIndex),
+      body: getScreen(_bottomItemIndex),
       drawer: Drawer(
-        child: 
-            ListView.builder(
-                itemCount: _account.clubs.length + 1,
-                itemBuilder: (BuildContext ctx, int index) {
-                  if (index == 0) {
-                    return  CreateDrawerHeader(_account);
-                  } 
-                  else {
-                    return ListTile(
-                      leading: Icon(
-                        Icons.home,
-                        color: Colors.grey[850],
-                      ),
-                      title: Text(_account.clubs[index-1].name),
-                      onTap: () {
-                        changeClub(_account.clubs[index-1]);
-                      },
-                    );
-                  }
-                }),
-      
+        child: ListView.builder(
+            itemCount: _clubs.length + 1,
+            itemBuilder: (BuildContext ctx, int index) {
+              if (index == 0) {
+                return CreateDrawerHeader(_account);
+              } else {
+                return ListTile(
+                  leading: Icon(
+                    Icons.home,
+                    color: Colors.grey[850],
+                  ),
+                  title: Text(_clubs[index - 1].name),
+                  onTap: () {
+                    changeClub(_clubs[index - 1]);
+                  },
+                );
+              }
+            }),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: _navItems,
@@ -132,18 +125,18 @@ class _MyHomePageState extends State<MyHomePage> {
             _bottomItemIndex = index;
           });
         },
-      ),  
+      ),
     );
   }
 
-UserAccountsDrawerHeader CreateDrawerHeader(Account account){
-  return UserAccountsDrawerHeader(
-    accountName: Text(
-      account.name,
-      style: TextStyle(
-        letterSpacing: 1.0,
-        fontSize: 25,
-        fontWeight: FontWeight.bold,
+  UserAccountsDrawerHeader CreateDrawerHeader(Account account) {
+    return UserAccountsDrawerHeader(
+      accountName: Text(
+        account.name,
+        style: TextStyle(
+          letterSpacing: 1.0,
+          fontSize: 25,
+          fontWeight: FontWeight.bold,
         ),
       ),
       accountEmail: Text(
@@ -152,40 +145,15 @@ UserAccountsDrawerHeader CreateDrawerHeader(Account account){
           letterSpacing: 0.7,
           fontSize: 15,
           fontWeight: FontWeight.normal,
-          ),
+        ),
       ),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.primary,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(40.0),
           bottomRight: Radius.circular(40.0),
-          ),
+        ),
       ),
     );
-}
-  
-  Account Load(){
-     List<Member> members = [
-      new Member(
-          '박준영', 'jaywapp16@gmail.com', '01076549816', Permission.president),
-      new Member(
-          '김총무', 'satgot@gmail.com', '01012345678', Permission.secretary),
-      new Member(
-        '홍회원', 'gildon@gmail.com', '01056781234', Permission.normal),
-    ];
-
-    List<String> participants = ['jaywapp16@gmail.com', 'satgot@gmail.com'];
-
-    List<Schedule> schedules = [
-      new Schedule('정규일정', '정규일정 입니다.', '경기 광주시 오포로171번길 17-19', new DateTime(2024, 09, 29),
-          participants)
-    ];
-
-    List<Club> clubs = [
-      new Club('1234', '경충FC', '풋살을 즐겁게 하자', new DateTime(2011, 08, 16),
-          members, schedules)
-    ];
-
-    return new Account("박준영", "jaywapp16@gmail.com", clubs);
   }
 }

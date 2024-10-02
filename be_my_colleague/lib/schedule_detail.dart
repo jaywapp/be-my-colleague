@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:be_my_colleague/Service/MapService.dart';
 import 'package:be_my_colleague/Styles.dart';
+import 'package:be_my_colleague/data/data_center.dart';
 import 'package:be_my_colleague/model/Member.dart';
 import 'package:be_my_colleague/model/account.dart';
 import 'package:be_my_colleague/model/club.dart';
@@ -47,7 +48,7 @@ class _ScheduleDetailState extends State<ScheduleDetail>{
   @override
   Widget build(BuildContext context) {
 
-     var members = widget.club.members
+     var members = DataCenter.GetMembers(widget.club)
       .where((member) =>  _schedule.participantMails.contains(member.mailAddress))
       .toList();
 

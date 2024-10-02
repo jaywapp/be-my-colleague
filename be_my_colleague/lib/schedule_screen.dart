@@ -1,3 +1,4 @@
+import 'package:be_my_colleague/data/data_center.dart';
 import 'package:be_my_colleague/model/account.dart';
 import 'package:be_my_colleague/model/club.dart';
 import 'package:be_my_colleague/schedule_block.dart';
@@ -23,9 +24,10 @@ class ScheduleScreenState extends State<ScheduleScreen> {
   Widget build(BuildContext context) {
     var account = widget.account;
     var club = widget.club;
+    var schedules =  DataCenter.GetSchedules(club);
 
     return ListView.builder(
-        itemCount: club.shedules.length,
+        itemCount: schedules.length,
         itemBuilder: (BuildContext ctx, int index) {
           return ScheduleBlock(
               onTap: () => {
@@ -35,12 +37,12 @@ class ScheduleScreenState extends State<ScheduleScreen> {
                         builder: (context) => ScheduleDetail(
                           account: account,
                           club: club,
-                          schedule: club.shedules[index],
+                          schedule: schedules[index],
                         ),
                       ),
                     ),
                   },
-              schedule: club.shedules[index]);
+              schedule: schedules[index]);
         });
   }
 }
