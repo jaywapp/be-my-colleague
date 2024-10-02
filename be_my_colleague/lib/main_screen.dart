@@ -50,7 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _bottomItemIndex = 0;
 
   List<Club> _clubs = [];
-  Club _selectedClub = new Club('', '', '', new DateTime(2011, 08, 16), 1);
+  Club _selectedClub = new Club('', '', '', new DateTime(2011, 08, 16), 1, '', '');
 
   DataCenter _dataCenter = new DataCenter('', '');
 

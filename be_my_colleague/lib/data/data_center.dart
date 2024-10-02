@@ -14,10 +14,6 @@ class DataCenter {
   List<Schedule> schedules = [];
   List<Club> clubs = [];
 
-  List<String> payed1 = [];
-  List<String> payed2 = [];
-  List<Due> dues = [];
-
   DataCenter(String name, String mailAddress){
     account = new Account(name, mailAddress);
     members = [
@@ -33,15 +29,7 @@ class DataCenter {
     ];
 
     clubs = [
-      new Club('1234', '경충FC', '풋살을 즐겁게 하자', new DateTime(2011, 08, 16), 1)
-    ];
-
-    payed1 = ['jaywapp16@gmail.com', 'gildon@gmail.com'];
-    payed2 = ['gildon@gmail.com'];
-
-    dues = [
-      new Due(2024, 8, payed1),
-      new Due(2024, 9, payed2),
+      new Club('1234', '경충FC', '풋살을 즐겁게 하자', new DateTime(2011, 08, 16), 1, '신한', '110-152-149740')
     ];
   }
 
@@ -57,7 +45,24 @@ class DataCenter {
     return clubs;
   } 
 
-  List<Due> GetDues(String clubID){
+  Club GetClub(String clubID){
+    return clubs.firstWhere((c) => c.id == clubID);
+  }
+
+  List<Due> GetDues(String clubID, String mailAddress){
+    List<Due> dues= [
+      new Due(new DateTime(2024, 7, 1), true),
+      new Due(new DateTime(2024, 8, 1), false),
+      new Due(new DateTime(2024, 9, 1), true),
+    ];
+
     return dues;
+  }
+
+  DateTime GetJoinTime(String clubId){
+    
+    return  GetMembers(clubId)
+      .firstWhere((m) => m.mailAddress == account.mailAddress).created;
+
   }
 }

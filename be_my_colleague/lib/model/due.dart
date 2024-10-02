@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 class Due {
-  int year = 1000;
-  int month = 1;
-  List<String> payed = [];
+  DateTime date = new DateTime(1000, 1, 1);
+  bool payed = false;
 
-  Due(this.year, this.month, this.payed);
+  Due(this.date, this.payed);
 }

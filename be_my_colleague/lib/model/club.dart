@@ -7,6 +7,8 @@ class Club {
   String description = '';  
   DateTime created = new DateTime(1000, 1, 1, 0, 0, 0, 0, 0);
   int dueDay = 1;
+  String bankAccount = '';
+  String bankName = '';
 
-  Club(this.id, this.name, this.description, this.created, this.dueDay);
+  Club(this.id, this.name, this.description, this.created, this.dueDay, this.bankName, this.bankAccount);
 }
