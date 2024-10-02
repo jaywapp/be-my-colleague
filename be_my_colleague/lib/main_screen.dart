@@ -70,15 +70,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget getScreen(int idx) {
     if (idx == 0) {
-      return HomeScreen(_selectedClub);
+      return HomeScreen(_account, _selectedClub);
     } else if (idx == 1) {
       return MembersScreen(_account, _selectedClub);
     } else if (idx == 2) {
       return ScheduleScreen(_account, _selectedClub);
     } else if (idx == 3) {
-      return DuesScreen(_selectedClub);
+      return DuesScreen(_account, _selectedClub);
     } else if (idx == 4) {
-      return MoreScreen(_selectedClub);
+      return MoreScreen(_account, _selectedClub);
     } else {
       throw Exception('Unknown screen');
     }

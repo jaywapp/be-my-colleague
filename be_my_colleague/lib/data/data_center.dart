@@ -8,7 +8,16 @@ import 'package:flutter/material.dart';
 class DataCenter {
 
   static List<Member> GetMembers(Club club){
-    return club.members;
+
+     List<Member> members = [
+      new Member(
+          '박준영', 'jaywapp16@gmail.com', '01076549816', Permission.president),
+      new Member(
+          '김총무', 'satgot@gmail.com', '01012345678', Permission.secretary),
+      new Member('홍회원', 'gildon@gmail.com', '01056781234', Permission.normal),
+    ];
+
+    return members;
   }
 
   static List<Schedule> GetSchedules(Club club){
@@ -32,7 +41,7 @@ class DataCenter {
     List<String> participants = ['jaywapp16@gmail.com', 'satgot@gmail.com'];
 
     List<Schedule> schedules = [
-      new Schedule('정규일정', '정규일정 입니다.', '경기 광주시 오포로171번길 17-19',
+      new Schedule('1', '정규일정', '정규일정 입니다.', '경기 광주시 오포로171번길 17-19',
           new DateTime(2024, 09, 29), participants)
     ];
 
