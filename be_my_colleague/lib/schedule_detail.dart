@@ -14,14 +14,14 @@ import 'package:flutter_naver_map/flutter_naver_map.dart';
 
 class ScheduleDetail extends StatefulWidget {
   final Account account;
-  final Club club;
-  final Schedule schedule;
+  final String clubID;
+  final String scheduleID;
 
   const ScheduleDetail(
       {super.key,
       required this.account,
-      required this.club,
-      required this.schedule});
+      required this.clubID,
+      required this.scheduleID});
 
   @override
   State<ScheduleDetail> createState() => _ScheduleDetailState();
@@ -33,9 +33,8 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
 
   void Load() {
     // 서버에서 최신 schedule 정보 로드
-    _schedule = widget.schedule;
-    _include =
-        widget.schedule.participantMails.contains(widget.account.mailAddress);
+    _schedule = DataCenter.GetSchedules(widget.clubID).firstWhere((o) => o.id == widget.scheduleID);
+    _include = _schedule.participantMails.contains(widget.account.mailAddress);
   }
 
   @override
@@ -46,7 +45,7 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
 
   @override
   Widget build(BuildContext context) {
-    var members = DataCenter.GetMembers(widget.club.id)
+    var members = DataCenter.GetMembers(widget.clubID)
         .where(
             (member) => _schedule.participantMails.contains(member.mailAddress))
         .toList();
@@ -90,12 +89,12 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
 
   void Absent() {
     // TODO : 서버에 데이터 제거 요청
-    widget.schedule.participantMails.remove(widget.account.mailAddress);
+    _schedule.participantMails.remove(widget.account.mailAddress);
   }
 
   void Attend() {
     // TODO : 서버에 데이터 추가 요청
-    widget.schedule.participantMails.add(widget.account.mailAddress);
+    _schedule.participantMails.add(widget.account.mailAddress);
   }
 
   Widget CreateMap(String location) {

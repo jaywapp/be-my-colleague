@@ -7,9 +7,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 class MembersScreen extends StatefulWidget {
   final Account account;
-  final Club club;
+  final String clubID;
 
-  const MembersScreen(this.account, this.club);
+  const MembersScreen(this.account, this.clubID);
 
   @override
   State<StatefulWidget> createState() => MembersScreenState();
@@ -18,7 +18,7 @@ class MembersScreen extends StatefulWidget {
 class MembersScreenState extends State<MembersScreen> {
   @override
   Widget build(BuildContext context) {
-    var club = widget.club;
+    var club = DataCenter.GetClubs(widget.account).firstWhere((o) => o.id == widget.clubID);
 
     // 멤버를 permission에 따라 정렬
     var members = DataCenter.GetMembers(club.id);

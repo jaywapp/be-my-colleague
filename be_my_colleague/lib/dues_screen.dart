@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 
 class DuesScreen extends StatefulWidget {
   final Account account;
-  final Club club;
+  final String clubID;
 
-  const DuesScreen(this.account, this.club);
+  const DuesScreen(this.account, this.clubID);
 
   @override
   State<StatefulWidget> createState() => DuesScreenState();
@@ -15,7 +15,6 @@ class DuesScreen extends StatefulWidget {
 class DuesScreenState extends State<DuesScreen> {
   @override
   Widget build(BuildContext context) {
-    var club = widget.club;
     return Text('dues');
   }
 }

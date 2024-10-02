@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 class HomeScreen extends StatefulWidget {
 
   final Account account;
-  final Club club;
+  final String clubID;
 
-  const HomeScreen(this.account, this.club);
+  const HomeScreen(this.account, this.clubID);
 
   @override
   State<StatefulWidget> createState() => HomeScreenState();
@@ -15,8 +15,7 @@ class HomeScreen extends StatefulWidget {
 
 class HomeScreenState extends State<HomeScreen> {
   @override
-  Widget build(BuildContext context) {
-    var club = widget.club;
+  Widget build(BuildContext context) {    
     return Text('home');
   }
 }

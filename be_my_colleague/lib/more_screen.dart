@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 
 class MoreScreen extends StatefulWidget {
   final Account account;
-  final Club club;
+  final String clubID;
 
-  const MoreScreen(this.account, this.club);
+  const MoreScreen(this.account, this.clubID);
 
   @override
   State<StatefulWidget> createState() => MoreScreenState();
@@ -15,7 +15,6 @@ class MoreScreen extends StatefulWidget {
 class MoreScreenState extends State<MoreScreen> {
   @override
   Widget build(BuildContext context) {
-    var club = widget.club;
     return Text('more');
   }
 }

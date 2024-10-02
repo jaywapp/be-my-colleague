@@ -10,9 +10,9 @@ class ScheduleScreen extends StatefulWidget {
 
   // 불변
   final Account account;
-  final Club club;
+  final String clubID;
 
-  const ScheduleScreen(this.account, this.club);
+  const ScheduleScreen(this.account, this.clubID);
 
   @override
   State<StatefulWidget> createState() => ScheduleScreenState();
@@ -30,7 +30,7 @@ class ScheduleScreenState extends State<ScheduleScreen> {
   @override
   void initState() {
     super.initState();
-    _schedules =  DataCenter.GetSchedules(widget.club.id);
+    _schedules =  DataCenter.GetSchedules(widget.clubID);
   }
 
   @override
@@ -46,8 +46,8 @@ class ScheduleScreenState extends State<ScheduleScreen> {
                       MaterialPageRoute(
                         builder: (context) => ScheduleDetail(
                           account: widget.account,
-                          club: widget.club,
-                          schedule: _schedules[index],
+                          clubID: widget.clubID,
+                          scheduleID: _schedules[index].id,
                         ),
                       ),
                     ),
