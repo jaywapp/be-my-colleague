@@ -36,7 +36,7 @@ class DuesScreenState extends State<DuesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Styles.CreateHeader(Icons.monetization_on_sharp , '회비 내역'),
+        title: Styles.CreateHeader(Icons.monetization_on_sharp , '회비납부내역'),
       ),
       body: Column(
 
