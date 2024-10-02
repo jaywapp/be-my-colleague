@@ -1,11 +1,15 @@
 import 'package:be_my_colleague/Styles.dart';
+import 'package:be_my_colleague/data/data_center.dart';
+import 'package:be_my_colleague/model/account.dart';
 import 'package:be_my_colleague/model/club.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MembersScreen extends StatefulWidget {
+  final Account account;
   final Club club;
-  const MembersScreen(this.club);
+
+  const MembersScreen(this.account, this.club);
 
   @override
   State<StatefulWidget> createState() => MembersScreenState();
@@ -17,8 +21,9 @@ class MembersScreenState extends State<MembersScreen> {
     var club = widget.club;
 
     // 멤버를 permission에 따라 정렬
-    club.members
-        .sort((a, b) => b.permission.index.compareTo(a.permission.index));
+    var members = DataCenter.GetMembers(club);
+    
+    members.sort((a, b) => b.permission.index.compareTo(a.permission.index));
 
     return Scaffold(
       appBar: AppBar(
@@ -35,9 +40,9 @@ class MembersScreenState extends State<MembersScreen> {
         ),
       ),
       body: ListView.builder(
-        itemCount: club.members.length,
+        itemCount: members.length,
         itemBuilder: (context, index) {
-          final member = club.members[index];
+          final member = members[index];
           return ListTile(
             leading: Icon(Icons.account_circle),
             title: Text(member.name, style: Styles.ContentStyle),
