@@ -4,11 +4,9 @@ import 'package:flutter/material.dart';
 class Account {
   String name = '';
   String mailAddress = '';
-  List<Club> clubs = [];
 
-  Account(String name, String mailAddress, List<Club> clubs) {
+  Account(String name, String mailAddress) {
     this.name = name;
     this.mailAddress = mailAddress;
-    this.clubs = clubs;
   }
 }

@@ -30,7 +30,7 @@ class ScheduleScreenState extends State<ScheduleScreen> {
   @override
   void initState() {
     super.initState();
-    _schedules =  DataCenter.GetSchedules(widget.club);
+    _schedules =  DataCenter.GetSchedules(widget.club.id);
   }
 
   @override

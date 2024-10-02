@@ -7,8 +7,7 @@ class Member {
   String phoneNumber = '';
   Permission permission = Permission.normal;
 
-  Member(String name, String mailAddress, String phoneNumber,
-      Permission permission) {
+  Member(String name, String mailAddress, String phoneNumber, Permission permission) {
     this.name = name;
     this.mailAddress = mailAddress;
     this.phoneNumber = '+82${phoneNumber.substring(1)}';

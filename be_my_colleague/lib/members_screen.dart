@@ -21,7 +21,7 @@ class MembersScreenState extends State<MembersScreen> {
     var club = widget.club;
 
     // 멤버를 permission에 따라 정렬
-    var members = DataCenter.GetMembers(club);
+    var members = DataCenter.GetMembers(club.id);
     
     members.sort((a, b) => b.permission.index.compareTo(a.permission.index));
 

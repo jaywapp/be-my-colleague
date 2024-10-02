@@ -46,7 +46,7 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
 
   @override
   Widget build(BuildContext context) {
-    var members = DataCenter.GetMembers(widget.club)
+    var members = DataCenter.GetMembers(widget.club.id)
         .where(
             (member) => _schedule.participantMails.contains(member.mailAddress))
         .toList();
