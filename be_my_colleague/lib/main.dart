@@ -1,5 +1,6 @@
 import 'package:be_my_colleague/Service/MapService.dart';
 import 'package:be_my_colleague/intro_screen.dart';
+import 'package:be_my_colleague/login_screen.dart';
 import 'package:be_my_colleague/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
@@ -12,10 +13,16 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+ 
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
+    String name = '박준영';
+    String mailAddress = 'jaywapp16@gmail.com';
+    bool isContinue = false;
+
     return MaterialApp(
         title: '너 내 동료가 돼라',
         theme: ThemeData(
@@ -25,22 +32,38 @@ class MyApp extends StatelessWidget {
           ),
           useMaterial3: true,
         ),
-        home: FutureBuilder(
+        home: 
+        isContinue 
+        ? FutureBuilder(
           future: Future.delayed(
               const Duration(seconds: 5), () => "Intro Completed."),
           builder: (context, snapshot) {
             return AnimatedSwitcher(
                 duration: const Duration(milliseconds: 1000),
-                child: _splashLoadingWidget(snapshot));
-          },
+                child: _splashLoadingWidget(snapshot, name, mailAddress));
+          },)
+        : AnimatedSwitcher(
+          duration: const Duration(milliseconds: 1000),
+          child: LoginScreen(),
         ));
+        
+        // FutureBuilder(
+        //   future: Future.delayed(
+        //       const Duration(seconds: 5), () => "Intro Completed."),
+        //   builder: (context, snapshot) {
+        //     return AnimatedSwitcher(
+        //         duration: const Duration(milliseconds: 1000),
+        //         child: _splashLoadingWidget(snapshot));
+        //   },
+        // ));
   }
 
-  Widget _splashLoadingWidget(AsyncSnapshot<Object?> snapshot) {
+  Widget _splashLoadingWidget(AsyncSnapshot<Object?> snapshot, String name, String mailAddress) {
     if (snapshot.hasError) {
       return const Text("Error!!");
     } else if (snapshot.hasData) {
-      return const MyHomePage(title: '너 내 동료가 돼라');
+      return MyHomePage(
+         title: '너 내 동료가 돼라', name: name, mailAddress: mailAddress);
     } else {
       return const IntroScreen();
     }

@@ -15,9 +15,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle; // 로컬 assets를 읽기 위해 필요
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({super.key, required this.title, required this.name, required this.mailAddress});
 
   final String title;
+  final String name;
+  final String mailAddress;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -65,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
-    _dataCenter = new DataCenter('박준영', 'jaywapp16@gmail.com');
+    _dataCenter = new DataCenter(widget.name, widget.mailAddress);
     _clubs = _dataCenter.GetClubs();
     _selectedClub = _clubs.first;
   }
