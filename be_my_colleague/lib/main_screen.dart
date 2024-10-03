@@ -15,9 +15,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle; // 로컬 assets를 읽기 위해 필요
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title, required this.name, required this.mailAddress});
+  const MyHomePage({super.key, required this.name, required this.mailAddress});
 
-  final String title;
   final String name;
   final String mailAddress;
 

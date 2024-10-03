@@ -1,4 +1,5 @@
 import 'package:be_my_colleague/Service/MapService.dart';
+import 'package:be_my_colleague/common.dart';
 import 'package:be_my_colleague/intro_screen.dart';
 import 'package:be_my_colleague/login_screen.dart';
 import 'package:be_my_colleague/main_screen.dart';
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
     bool isContinue = false;
 
     return MaterialApp(
-        title: '너 내 동료가 돼라',
+        title: Common.title,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
             seedColor: Colors.blue,
@@ -62,8 +63,7 @@ class MyApp extends StatelessWidget {
     if (snapshot.hasError) {
       return const Text("Error!!");
     } else if (snapshot.hasData) {
-      return MyHomePage(
-         title: '너 내 동료가 돼라', name: name, mailAddress: mailAddress);
+      return MyHomePage(name: name, mailAddress: mailAddress);
     } else {
       return const IntroScreen();
     }

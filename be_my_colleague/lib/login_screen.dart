@@ -1,5 +1,7 @@
+import 'package:be_my_colleague/common.dart';
 import 'package:be_my_colleague/main_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen();
@@ -27,14 +29,15 @@ class LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Text(
-                        "너 내 동료가 돼라",
+                        Common.title,
                         style: TextStyle(
                             fontSize: 40,
                             fontWeight: FontWeight.bold,
                             color: Colors.white),
                       ),
                       Align(
-                        child: Text("© Copyright 2024, BlueHeart",
+                        child: Text(
+                          Common.copyright,
                             style: TextStyle(
                               fontSize: 15,
                               color: Color.fromRGBO(255, 255, 255, 0.6),
@@ -46,13 +49,7 @@ class LoginScreenState extends State<LoginScreen> {
             Flexible(
               flex: 1,
               child: ElevatedButton(
-                onPressed: () 
-                {
-                  var name = '박준영';
-                  var mailAddress = 'jaywapp16@gmail.com';
-                  
-                   Route(name, mailAddress); 
-                },
+                onPressed: () =>  Login(),
                 child: Text('Login with Google'),
               ),
             ),
@@ -60,14 +57,23 @@ class LoginScreenState extends State<LoginScreen> {
         ));
   }
 
+  void Login() async {
+    GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    var name = googleUser?.displayName ?? '';
+    var mailAddress = googleUser?.email ?? '';
+
+    Route(name, mailAddress);
+  }
+
   void Route(String name, String mailAddress) {
+    Navigator.pop(context);
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => AnimatedSwitcher(
                 duration: const Duration(milliseconds: 1000),
-                child: MyHomePage(
-                    title: '너 내 동료가 돼라',
+                child: MyHomePage(                    
                     name: name,
                     mailAddress: mailAddress))));
   }
