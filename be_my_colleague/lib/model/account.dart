@@ -5,8 +5,5 @@ class Account {
   String name = '';
   String mailAddress = '';
 
-  Account(String name, String mailAddress) {
-    this.name = name;
-    this.mailAddress = mailAddress;
-  }
+  Account(this.name, this.mailAddress);
 }

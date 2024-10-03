@@ -1,3 +1,4 @@
+import 'package:be_my_colleague/Styles.dart';
 import 'package:be_my_colleague/data/data_center.dart';
 import 'package:be_my_colleague/model/account.dart';
 import 'package:be_my_colleague/model/club.dart';
@@ -35,7 +36,12 @@ class ScheduleScreenState extends State<ScheduleScreen> {
   @override
   Widget build(BuildContext context) {
 
-    return ListView.builder(
+    return Scaffold(
+      appBar: AppBar(
+        title: Styles.CreateHeader(Icons.calendar_month, '일정정보'),
+      ),
+
+      body: ListView.builder(
         itemCount: _schedules.length,
         itemBuilder: (BuildContext ctx, int index) {
           return ScheduleBlock(
@@ -52,6 +58,7 @@ class ScheduleScreenState extends State<ScheduleScreen> {
                     ),
                   },
               schedule: _schedules[index]);
-        });
+        })
+      );
   }
 }

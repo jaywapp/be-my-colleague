@@ -1,4 +1,5 @@
-import 'package:be_my_colleague/model/Member.dart';
+import 'package:be_my_colleague/model/due.dart';
+import 'package:be_my_colleague/model/member.dart';
 import 'package:be_my_colleague/model/account.dart';
 import 'package:be_my_colleague/model/club.dart';
 import 'package:be_my_colleague/model/enums.dart';
@@ -16,9 +17,9 @@ class DataCenter {
   DataCenter(String name, String mailAddress){
     account = new Account(name, mailAddress);
     members = [
-      new Member('박준영', 'jaywapp16@gmail.com', '01076549816', Permission.president),
-      new Member('김총무', 'satgot@gmail.com', '01012345678', Permission.secretary),
-      new Member('홍회원', 'gildon@gmail.com', '01056781234', Permission.normal),
+      new Member('박준영', 'jaywapp16@gmail.com', '01076549816', new DateTime(1991, 8, 16), new DateTime(2010, 1, 1), Permission.president),
+      new Member('김총무', 'satgot@gmail.com', '01012345678',new DateTime(1993, 1, 12), new DateTime(2013, 1, 1), Permission.secretary),
+      new Member('홍회원', 'gildon@gmail.com', '01056781234',new DateTime(1997, 2, 26), new DateTime(2014, 1, 1), Permission.normal),
     ];
 
      participants = ['jaywapp16@gmail.com', 'satgot@gmail.com'];
@@ -28,7 +29,7 @@ class DataCenter {
     ];
 
     clubs = [
-      new Club('1234', '경충FC', '풋살을 즐겁게 하자', new DateTime(2011, 08, 16))
+      new Club('1234', '경충FC', '풋살을 즐겁게 하자', new DateTime(2011, 08, 16), 1, '신한', '110-152-149740')
     ];
   }
 
@@ -43,4 +44,25 @@ class DataCenter {
   List<Club> GetClubs(){
     return clubs;
   } 
+
+  Club GetClub(String clubID){
+    return clubs.firstWhere((c) => c.id == clubID);
+  }
+
+  List<Due> GetDues(String clubID, String mailAddress){
+    List<Due> dues= [
+      new Due(new DateTime(2024, 7, 1), true),
+      new Due(new DateTime(2024, 8, 1), false),
+      new Due(new DateTime(2024, 9, 1), true),
+    ];
+
+    return dues;
+  }
+
+  DateTime GetJoinTime(String clubId){
+    
+    return  GetMembers(clubId)
+      .firstWhere((m) => m.mailAddress == account.mailAddress).created;
+
+  }
 }
