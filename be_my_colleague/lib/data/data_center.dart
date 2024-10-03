@@ -25,7 +25,7 @@ class DataCenter {
      participants = ['jaywapp16@gmail.com', 'satgot@gmail.com'];
 
      schedules = [
-      new Schedule('1', '정규일정', '정규일정 입니다.', '경기 광주시 오포로171번길 17-19', new DateTime(2024, 09, 29), participants)
+      new Schedule('1', '정규일정', '정규일정 입니다.', '경기 광주시 오포로171번길 17-19', new DateTime(2024, 09, 29), '정규 풋살 일정입니다.', participants)
     ];
 
     clubs = [
@@ -64,5 +64,16 @@ class DataCenter {
     return  GetMembers(clubId)
       .firstWhere((m) => m.mailAddress == account.mailAddress).created;
 
+  }
+
+  void Absent(String scheduleID, String mailAddress){
+    var schedule = schedules.firstWhere((s) =>  s.id == scheduleID);
+    schedule.participantMails.remove(mailAddress);
+  }
+
+  
+  void Attend(String scheduleID, String mailAddress){
+    var schedule = schedules.firstWhere((s) =>  s.id == scheduleID);
+    schedule.participantMails.add(mailAddress);
   }
 }

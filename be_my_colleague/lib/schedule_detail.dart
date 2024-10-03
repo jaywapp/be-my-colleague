@@ -28,7 +28,7 @@ class ScheduleDetail extends StatefulWidget {
 }
 
 class _ScheduleDetailState extends State<ScheduleDetail> {
-  Schedule _schedule = new Schedule('', '', '', '', new DateTime(1000, 00, 00), []);
+  Schedule _schedule = new Schedule('', '', '', '', new DateTime(1000, 00, 00), '', []);
   bool _include = false;
 
   void Load() {
@@ -61,6 +61,8 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
             Styles.CreateHeader(Icons.map_outlined, '어디서'),
             Styles.CreateContent(_schedule.location),
             CreateMap(_schedule.location),
+            Styles.CreateHeader(Icons.question_mark, '무엇을'),
+            Styles.CreateContent(_schedule.content),
             Styles.CreateHeader(Icons.supervised_user_circle, '누가'),
             CreateParticipants(context,  widget.dataCenter.account, members),
           ],
@@ -73,11 +75,9 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
           foregroundColor: _include ? Colors.black : Colors.white,
           onPressed: () {
             if (_include) {
-              // 일정에 포함된 경우 -> 불참으로 변경
-              Absent();
+              widget.dataCenter.Absent(_schedule.id, widget.dataCenter.account.mailAddress);
             } else {
-              // 일정에 미포함된 경우 -> 참석으로 변경
-              Attend();
+              widget.dataCenter.Attend(_schedule.id, widget.dataCenter.account.mailAddress);
             }
 
             setState(() {
@@ -87,18 +87,11 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
     );
   }
 
-  void Absent() {
-    // TODO : 서버에 데이터 제거 요청
-    _schedule.participantMails.remove(widget.dataCenter.account.mailAddress);
-  }
-
-  void Attend() {
-    // TODO : 서버에 데이터 추가 요청
-    _schedule.participantMails.add(widget.dataCenter.account.mailAddress);
-  }
-
   Widget CreateMap(String location) {
     final Completer<NaverMapController> mapControllerCompleter = Completer();
+
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Container(
       child: FutureBuilder(
@@ -111,8 +104,9 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
               double lat = double.parse(latStr);
               double lng = double.parse(lngStr);
 
-              return Flexible(
-                  flex: 1,
+              return SizedBox(
+                  width: screenWidth,
+                  height: screenHeight / 4,
                   child: NaverMap(
                     options: NaverMapViewOptions(
                         initialCameraPosition: NCameraPosition(
