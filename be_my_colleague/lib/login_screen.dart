@@ -9,17 +9,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class LoginScreenState extends State<LoginScreen> {
-  String name = '';
-  String mailAddress = '';
-  bool isContinue = false;
-
   @override
   void initState() {
     super.initState();
-
-    name = '박준영';
-    mailAddress = 'jaywapp16@gmail.com';
-    isContinue = true;
   }
 
   @override
@@ -54,7 +46,13 @@ class LoginScreenState extends State<LoginScreen> {
             Flexible(
               flex: 1,
               child: ElevatedButton(
-                onPressed: () { Route(name, mailAddress); },
+                onPressed: () 
+                {
+                  var name = '박준영';
+                  var mailAddress = 'jaywapp16@gmail.com';
+                  
+                   Route(name, mailAddress); 
+                },
                 child: Text('Login with Google'),
               ),
             ),
