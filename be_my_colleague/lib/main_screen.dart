@@ -12,13 +12,13 @@ import 'package:be_my_colleague/model/schedule.dart';
 import 'package:be_my_colleague/more_screen.dart';
 import 'package:be_my_colleague/schedule_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle; // 로컬 assets를 읽기 위해 필요
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:google_sign_in/google_sign_in.dart'; // 로컬 assets를 읽기 위해 필요
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.name, required this.mailAddress});
+  const MyHomePage({super.key, required this.account});
 
-  final String name;
-  final String mailAddress;
+  final GoogleSignInAccount? account;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -53,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Club> _clubs = [];
   Club _selectedClub = new Club('', '', '', new DateTime(2011, 08, 16), 1, '', '');
 
-  DataCenter _dataCenter = new DataCenter('', '');
+  DataCenter _dataCenter = new DataCenter(null);
 
   void changeClub(Club club) {
     setState(() {
@@ -66,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
-    _dataCenter = new DataCenter(widget.name, widget.mailAddress);
+    _dataCenter = new DataCenter(widget.account);
     _clubs = _dataCenter.GetClubs();
     _selectedClub = _clubs.first;
   }

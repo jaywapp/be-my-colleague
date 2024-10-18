@@ -2,7 +2,9 @@ import 'package:be_my_colleague/Styles.dart';
 import 'package:be_my_colleague/data/data_center.dart';
 import 'package:be_my_colleague/model/account.dart';
 import 'package:be_my_colleague/model/club.dart';
+import 'package:be_my_colleague/model/member.dart';
 import 'package:flutter/material.dart';
+import 'package:googleapis/androidmanagement/v1.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MembersScreen extends StatefulWidget {
@@ -19,18 +21,27 @@ class MembersScreen extends StatefulWidget {
 class MembersScreenState extends State<MembersScreen> {
   @override
   Widget build(BuildContext context) {
-    var club = widget.dataCenter.GetClubs().firstWhere((o) => o.id == widget.clubID);
 
-    // 멤버를 permission에 따라 정렬
-    var members = widget.dataCenter.GetMembers(club.id);
-    
-    members.sort((a, b) => b.permission.index.compareTo(a.permission.index));
+    var club = widget.dataCenter.GetClubs().firstWhere((o) => o.id == widget.clubID);
 
     return Scaffold(
       appBar: AppBar(
         title: Styles.CreateHeader(Icons.supervised_user_circle_sharp, '회원정보'),
       ),
-      body: ListView.builder(
+      body: FutureBuilder(
+        future: widget.dataCenter.GetMembers(club.id), 
+        builder: (context, snapshot) {
+
+          var members = snapshot?.data ?? List.empty();
+          members.sort((a, b) => b.permission.index.compareTo(a.permission.index));
+
+          return CreateListView(members);
+        }),
+    );
+  }
+
+  Widget CreateListView(List<Member> members) {
+    return ListView.builder(
         itemCount: members.length,
         itemBuilder: (context, index) {
           final member = members[index];
@@ -45,8 +56,7 @@ class MembersScreenState extends State<MembersScreen> {
             ),
           );
         },
-      ),
-    );
+      );
   }
 
   Future<void> _makePhoneCall(String phoneNumber) async {

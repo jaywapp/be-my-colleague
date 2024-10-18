@@ -58,23 +58,26 @@ class LoginScreenState extends State<LoginScreen> {
   }
 
   void Login() async {
-    GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    GoogleSignInAccount? googleUser = await GoogleSignIn(
+      scopes: [
+        'https://www.googleapis.com/auth/spreadsheets',
+      ],
+    )
+    .signIn();
 
     var name = googleUser?.displayName ?? '';
     var mailAddress = googleUser?.email ?? '';
 
-    Route(name, mailAddress);
+    Route(googleUser);
   }
 
-  void Route(String name, String mailAddress) {
+  void Route(GoogleSignInAccount? account) {
     Navigator.pop(context);
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => AnimatedSwitcher(
                 duration: const Duration(milliseconds: 1000),
-                child: MyHomePage(                    
-                    name: name,
-                    mailAddress: mailAddress))));
+                child: MyHomePage(account: account))));
   }
 }

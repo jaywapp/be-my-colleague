@@ -34,18 +34,9 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         home: 
-        isContinue 
-        ? FutureBuilder(
-          future: Future.delayed(
-              const Duration(seconds: 5), () => "Intro Completed."),
-          builder: (context, snapshot) {
-            return AnimatedSwitcher(
-                duration: const Duration(milliseconds: 1000),
-                child: _splashLoadingWidget(snapshot, name, mailAddress));
-          },)
-        : AnimatedSwitcher(
+         AnimatedSwitcher(
           duration: const Duration(milliseconds: 1000),
-          child: LoginScreen(),
+          child: LoginScreen()
         ));
         
         // FutureBuilder(
@@ -59,13 +50,13 @@ class MyApp extends StatelessWidget {
         // ));
   }
 
-  Widget _splashLoadingWidget(AsyncSnapshot<Object?> snapshot, String name, String mailAddress) {
-    if (snapshot.hasError) {
-      return const Text("Error!!");
-    } else if (snapshot.hasData) {
-      return MyHomePage(name: name, mailAddress: mailAddress);
-    } else {
-      return const IntroScreen();
-    }
-  }
+  // Widget _splashLoadingWidget(AsyncSnapshot<Object?> snapshot, String name, String mailAddress) {
+  //   if (snapshot.hasError) {
+  //     return const Text("Error!!");
+  //   } else if (snapshot.hasData) {
+  //     return MyHomePage(name: name, mailAddress: mailAddress);
+  //   } else {
+  //     return const IntroScreen();
+  //   }
+  // }
 }

@@ -1,3 +1,4 @@
+import 'package:be_my_colleague/Service/GoogleHttpClient.dart';
 import 'package:be_my_colleague/model/due.dart';
 import 'package:be_my_colleague/model/member.dart';
 import 'package:be_my_colleague/model/account.dart';
@@ -5,8 +6,16 @@ import 'package:be_my_colleague/model/club.dart';
 import 'package:be_my_colleague/model/enums.dart';
 import 'package:be_my_colleague/model/schedule.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:googleapis/sheets/v4.dart' as sheets;
+import 'package:google_sign_in/google_sign_in.dart';
+
+
 
 class DataCenter {
+
+  GoogleSignInAccount? googleAccount;
 
   Account account = new Account('', '');
   List<Member> members = [];
@@ -14,7 +23,13 @@ class DataCenter {
   List<Schedule> schedules = [];
   List<Club> clubs = [];
 
-  DataCenter(String name, String mailAddress){
+  DataCenter(GoogleSignInAccount? googleUser){
+
+    googleAccount= googleUser;
+
+    var name = googleUser?.displayName ?? '';
+    var mailAddress = googleUser?.email ?? '';
+
     account = new Account(name, mailAddress);
     members = [
       new Member('박준영', 'jaywapp16@gmail.com', '01076549816', new DateTime(1991, 8, 16), new DateTime(2010, 1, 1), Permission.president),
@@ -29,12 +44,53 @@ class DataCenter {
     ];
 
     clubs = [
-      new Club('1234', '경충FC', '풋살을 즐겁게 하자', new DateTime(2011, 08, 16), 1, '신한', '110-152-149740')
+      new Club('1Op1lymJ1oDr8IazasJpq3UDUtUTfysVzGsa-sJlQIPI', '경충FC', '풋살을 즐겁게 하자', new DateTime(2011, 08, 16), 1, '신한', '110-152-149740')
     ];
   }
 
-  List<Member> GetMembers(String clubID){
-    return members;
+
+
+  Future<List<Member>> GetMembers(String clubID) async{
+    if(googleAccount == null)
+      return List.empty();
+
+    List<Member> result  = [];
+
+    final headers = await googleAccount?.authHeaders ?? new Map<String, String>();
+    final authenticatedClient = GoogleHttpClient(headers);
+
+    final sheetsApi = sheets.SheetsApi(authenticatedClient);
+    var spreadsheetId = clubID;
+    var range = '회원!A2:F30';
+
+    try {
+
+      var sheets = sheetsApi.spreadsheets;
+      var response = await sheets.values.get(spreadsheetId, range);
+      var values = response.values;
+
+      if (values != null) {
+        for (var row in values) {
+
+          var name = (row.elementAtOrNull(0) as String) ?? '';
+          var mail = (row.elementAtOrNull(1) as String) ?? '';
+          var number = (row.elementAtOrNull(2) as String) ?? '';
+          var birth = (row.elementAtOrNull(3) as String) ?? '';
+          var join = (row.elementAtOrNull(4)  as String)?? '';
+          var per = (row.elementAtOrNull(5) as String) ?? '';
+
+          var birthDate = DateTime.parse(birth ?? '');
+          var joinDate = DateTime.parse(join ?? '');
+          var permission = Parse(per);
+
+          var member = new Member(name, mail, number, birthDate, joinDate, permission);
+
+          result.add(member);
+        }
+      }
+    } catch (e) {}
+
+    return result;
   }
 
   List<Schedule> GetSchedules(String clubID){
@@ -59,10 +115,10 @@ class DataCenter {
     return dues;
   }
 
-  DateTime GetJoinTime(String clubId){
+  Future<DateTime> GetJoinTime(String clubId) async{
     
-    return  GetMembers(clubId)
-      .firstWhere((m) => m.mailAddress == account.mailAddress).created;
+    var time = await GetMembers(clubId);
+    return time.firstWhere((m) => m.mailAddress == account.mailAddress).created;
 
   }
 
@@ -75,5 +131,20 @@ class DataCenter {
   void Attend(String scheduleID, String mailAddress){
     var schedule = schedules.firstWhere((s) =>  s.id == scheduleID);
     schedule.participantMails.add(mailAddress);
+  }
+
+  static Permission Parse(String permission) {
+    switch (permission) {
+      case 'president':
+        return Permission.president;
+      case 'vicePresident':
+        return Permission.vicePresident;
+      case 'secretary':
+        return Permission.secretary;
+      case 'normal':
+        return Permission.normal;
+      default:
+        throw Exception('Unknown permission: $permission');
+    }
   }
 }

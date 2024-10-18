@@ -45,46 +45,71 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
 
   @override
   Widget build(BuildContext context) {
-    var members = widget.dataCenter.GetMembers(widget.clubID)
-        .where(
-            (member) => _schedule.participantMails.contains(member.mailAddress))
+    return FutureBuilder(
+      future: GetData(), 
+      builder: (context, snapshot){
+        return CreateWidget(snapshot?.data?.$1, snapshot?.data?.$2);
+      });
+  }
+
+  Future<(Schedule, List<Member>)> GetData() async{
+    var schedule = await widget.dataCenter.GetSchedules(widget.clubID).firstWhere((o) => o.id == widget.scheduleID);
+    var members = await widget.dataCenter.GetMembers(widget.clubID);
+
+    return (schedule, members);
+  }
+
+  Widget CreateWidget(Schedule? schedule, List<Member>? members){
+      return Scaffold(
+        appBar: AppBar(title: Text(schedule?.name ?? '')),
+        body : CreatePadding(schedule, members),
+        floatingActionButton:  CreateFloatingButton(schedule),
+      );
+  }
+
+  Widget CreatePadding(Schedule? schedule, List<Member>? members){
+
+    var targets = (members ?? List.empty())
+        .where((member) => schedule?.participantMails?.contains(member.mailAddress) ?? false)
         .toList();
 
-    return Scaffold(
-      appBar: AppBar(title: Text(_schedule.name)),
-      body: Padding(
+    return Padding(
         padding: EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 12.0),
         child: Column(
           children: [
             Styles.CreateHeader(Icons.access_time, '언제'),
-            Styles.CreateContent(convert(_schedule.dateTime)),
+            Styles.CreateContent(convert(schedule?.dateTime ?? new DateTime(1000))),
             Styles.CreateHeader(Icons.map_outlined, '어디서'),
-            Styles.CreateContent(_schedule.location),
-            CreateMap(_schedule.location),
+            Styles.CreateContent(schedule?.location ?? ''),
+            CreateMap(schedule?.location ?? ''),
             Styles.CreateHeader(Icons.question_mark, '무엇을'),
-            Styles.CreateContent(_schedule.content),
+            Styles.CreateContent(schedule?.content ?? ''),
             Styles.CreateHeader(Icons.supervised_user_circle, '누가'),
-            CreateParticipants(context,  widget.dataCenter.account, members),
+            CreateParticipants(context,  widget.dataCenter.account, targets),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-          icon: _include ? const Icon(Icons.cancel) : const Icon(Icons.check),
-          label: Text(_include ? '이번 일정은 불참합니다.' : '이번 일정은 참석합니다.'),
-          backgroundColor: _include ? Colors.red : Colors.blue,
-          foregroundColor: _include ? Colors.black : Colors.white,
+      );
+  }
+
+  Widget CreateFloatingButton(Schedule? schedule){
+    var include = schedule?.participantMails?.contains(widget.dataCenter.account.mailAddress) ?? false;
+
+    return FloatingActionButton.extended(
+          icon: include ? const Icon(Icons.cancel) : const Icon(Icons.check),
+          label: Text(include ? '이번 일정은 불참합니다.' : '이번 일정은 참석합니다.'),
+          backgroundColor: include ? Colors.red : Colors.blue,
+          foregroundColor: include ? Colors.black : Colors.white,
           onPressed: () {
-            if (_include) {
-              widget.dataCenter.Absent(_schedule.id, widget.dataCenter.account.mailAddress);
+            if (include) {
+              widget.dataCenter.Absent(schedule?.id ?? '', widget.dataCenter.account.mailAddress);
             } else {
-              widget.dataCenter.Attend(_schedule.id, widget.dataCenter.account.mailAddress);
+              widget.dataCenter.Attend(schedule?.id ?? '', widget.dataCenter.account.mailAddress);
             }
 
             setState(() {
               Load();
             });
-          }),
-    );
+          });
   }
 
   Widget CreateMap(String location) {
@@ -129,7 +154,7 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
 
                       controller.addOverlay(marker);
                       final onMarkerInfoWindow = NInfoWindow.onMarker(
-                          id: marker.info.id, text: _schedule.location);
+                          id: marker.info.id, text: location);
                       marker.openInfoWindow(onMarkerInfoWindow);
                     },
                   ));
