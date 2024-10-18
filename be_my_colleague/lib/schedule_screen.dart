@@ -20,9 +20,6 @@ class ScheduleScreen extends StatefulWidget {
 
 class ScheduleScreenState extends State<ScheduleScreen> {
   
-  // 가변
-  List<Schedule> _schedules = [];
-  
   String convert(DateTime now) {
     return "${now.year.toString()}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString().padLeft(2, '0')}-${now.minute.toString().padLeft(2, '0')}";
   }
@@ -30,7 +27,6 @@ class ScheduleScreenState extends State<ScheduleScreen> {
   @override
   void initState() {
     super.initState();
-    _schedules =  widget.dataCenter.GetSchedules(widget.clubID);
   }
 
   @override
@@ -41,10 +37,22 @@ class ScheduleScreenState extends State<ScheduleScreen> {
         title: Styles.CreateHeader(Icons.calendar_month, '일정정보'),
       ),
 
-      body: ListView.builder(
-        itemCount: _schedules.length,
-        itemBuilder: (BuildContext ctx, int index) {
-          return ScheduleBlock(
+      body: FutureBuilder(
+        future: widget.dataCenter.GetSchedules(widget.clubID), 
+        builder: (context, snapshot){
+          return ListView.builder(
+            itemCount: snapshot?.data?.length ?? 0,
+            itemBuilder: (BuildContext ctx, int index) {
+              var schedule = snapshot?.data?.elementAtOrNull(index);
+              return CreateBlock(schedule);
+            },
+          );
+        })
+      );
+  }
+
+  Widget CreateBlock(Schedule? schedule){
+    return ScheduleBlock(
               onTap: () => {
                     Navigator.push(
                       context,
@@ -52,13 +60,12 @@ class ScheduleScreenState extends State<ScheduleScreen> {
                         builder: (context) => ScheduleDetail(
                           dataCenter: widget.dataCenter,
                           clubID: widget.clubID,
-                          scheduleID: _schedules[index].id,
+                          scheduleID: schedule?.id ?? '',
                         ),
                       ),
                     ),
                   },
-              schedule: _schedules[index]);
-        })
-      );
+              schedule: schedule);
+
   }
 }
