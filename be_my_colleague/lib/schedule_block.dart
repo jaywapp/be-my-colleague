@@ -2,7 +2,7 @@ import 'package:be_my_colleague/model/schedule.dart';
 import 'package:flutter/material.dart';
 
 class ScheduleBlock extends StatelessWidget {
-  final Schedule schedule;
+  final Schedule? schedule;
   final VoidCallback onTap;
 
   ScheduleBlock({required this.schedule, required this.onTap});
@@ -42,7 +42,7 @@ class ScheduleBlock extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(children: [
-                            Text(convert(schedule.dateTime),
+                            Text(convert(schedule?.dateTime ?? new DateTime(1000)),
                                 style: TextStyle(
                                   fontSize: dateTimeFontSize,
                                   fontWeight: dateTimeFontWeight,
@@ -51,7 +51,7 @@ class ScheduleBlock extends StatelessWidget {
                           ]),
                           Row(children: [
                             Text(
-                              schedule.name,
+                              schedule?.name ?? '',
                               style: TextStyle(
                                 fontSize: nameFontSize,
                                 fontWeight: nameFontWeight,
@@ -62,7 +62,7 @@ class ScheduleBlock extends StatelessWidget {
                           Row(
                             children: [
                               Text(
-                                  schedule.location,
+                                  schedule?.location ?? '',
                                   style: TextStyle(
                                     fontSize: locationFontSize,
                                     fontWeight: locationFontWeight,
@@ -77,7 +77,7 @@ class ScheduleBlock extends StatelessWidget {
                         child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(schedule.participantMails.length.toString() + '명',
+                        Text((schedule?.participantMails?.length?.toString() ?? '0') + '명',
                             style: TextStyle(
                               fontSize: participantFontSize,
                               fontWeight: participantFontWeight,

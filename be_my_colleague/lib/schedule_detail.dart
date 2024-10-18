@@ -28,19 +28,11 @@ class ScheduleDetail extends StatefulWidget {
 }
 
 class _ScheduleDetailState extends State<ScheduleDetail> {
-  Schedule _schedule = new Schedule('', '', '', '', new DateTime(1000, 00, 00), '', []);
-  bool _include = false;
 
-  void Load() {
-    // 서버에서 최신 schedule 정보 로드
-    _schedule = widget.dataCenter.GetSchedules(widget.clubID).firstWhere((o) => o.id == widget.scheduleID);
-    _include = _schedule.participantMails.contains(widget.dataCenter.account.mailAddress);
-  }
 
   @override
   void initState() {
     super.initState();
-    Load();
   }
 
   @override
@@ -53,7 +45,8 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
   }
 
   Future<(Schedule, List<Member>)> GetData() async{
-    var schedule = await widget.dataCenter.GetSchedules(widget.clubID).firstWhere((o) => o.id == widget.scheduleID);
+    var schedules =  await widget.dataCenter.GetSchedules(widget.clubID);
+    var schedule = schedules.firstWhere((o) => o.id == widget.scheduleID);
     var members = await widget.dataCenter.GetMembers(widget.clubID);
 
     return (schedule, members);
@@ -106,9 +99,7 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
               widget.dataCenter.Attend(schedule?.id ?? '', widget.dataCenter.account.mailAddress);
             }
 
-            setState(() {
-              Load();
-            });
+            setState(() { });
           });
   }
 
@@ -123,8 +114,8 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
           future: MapService.getLatLngFromAddress(location),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
-              var latStr = snapshot.data?.values?.elementAt(0) ?? 0;
-              var lngStr = snapshot.data?.values?.elementAt(1) ?? 0;
+              var latStr = snapshot.data?.values?.elementAt(0) ?? '0';
+              var lngStr = snapshot.data?.values?.elementAt(1) ?? '0';
 
               double lat = double.parse(latStr);
               double lng = double.parse(lngStr);
