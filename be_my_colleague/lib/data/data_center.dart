@@ -11,77 +11,67 @@ import 'package:http/http.dart' as http;
 import 'package:googleapis/sheets/v4.dart' as sheets;
 import 'package:google_sign_in/google_sign_in.dart';
 
-
-
 class DataCenter {
-
   GoogleSignInAccount? googleAccount;
 
   Account account = new Account('', '');
-  List<Member> members = [];
-  List<String> participants = [];
-  List<Schedule> schedules = [];
   List<Club> clubs = [];
 
-  DataCenter(GoogleSignInAccount? googleUser){
-
-    googleAccount= googleUser;
+  DataCenter(GoogleSignInAccount? googleUser) {
+    googleAccount = googleUser;
 
     var name = googleUser?.displayName ?? '';
     var mailAddress = googleUser?.email ?? '';
 
     account = new Account(name, mailAddress);
-    members = [
-      new Member('박준영', 'jaywapp16@gmail.com', '01076549816', new DateTime(1991, 8, 16), new DateTime(2010, 1, 1), Permission.president),
-      new Member('김총무', 'satgot@gmail.com', '01012345678',new DateTime(1993, 1, 12), new DateTime(2013, 1, 1), Permission.secretary),
-      new Member('홍회원', 'gildon@gmail.com', '01056781234',new DateTime(1997, 2, 26), new DateTime(2014, 1, 1), Permission.normal),
-    ];
-
-     participants = ['jaywapp16@gmail.com', 'satgot@gmail.com'];
-
-     schedules = [
-      new Schedule('1', '정규일정', '정규일정 입니다.', '경기 광주시 오포로171번길 17-19', new DateTime(2024, 09, 29), '정규 풋살 일정입니다.', participants)
-    ];
 
     clubs = [
-      new Club('1Op1lymJ1oDr8IazasJpq3UDUtUTfysVzGsa-sJlQIPI', '경충FC', '풋살을 즐겁게 하자', new DateTime(2011, 08, 16), 1, '신한', '110-152-149740')
+      new Club('1Op1lymJ1oDr8IazasJpq3UDUtUTfysVzGsa-sJlQIPI', '경충FC',
+          '풋살을 즐겁게 하자', new DateTime(2011, 08, 16), 1, '신한', '110-152-149740')
     ];
   }
 
-  Future<List<Member>> GetMembers(String clubID) async{
-    if(googleAccount == null)
-      return List.empty();
+  Future<List<Member>> GetMembers(String clubID) async {
+    if (googleAccount == null) return List.empty();
 
-    List<Member> result  = [];
+    List<Member> result = [];
 
-    final headers = await googleAccount?.authHeaders ?? new Map<String, String>();
+    final headers =
+        await googleAccount?.authHeaders ?? new Map<String, String>();
     final authenticatedClient = GoogleHttpClient(headers);
 
     final sheetsApi = sheets.SheetsApi(authenticatedClient);
     var spreadsheetId = clubID;
-    var range = '회원!A2:F';
+    var sheetName = '회원';
 
     try {
-
       var sheets = sheetsApi.spreadsheets;
+
+      final spreadsheet = await sheetsApi.spreadsheets.get(spreadsheetId);
+      final sheet = spreadsheet.sheets!
+          .firstWhere((sheet) => sheet.properties!.title == sheetName);
+      final int rowCount = sheet.properties!.gridProperties!.rowCount!;
+
+      final range = '$sheetName!A2:F$rowCount';
+
       var response = await sheets.values.get(spreadsheetId, range);
       var values = response.values;
 
       if (values != null) {
         for (var row in values) {
-
           var name = (row.elementAtOrNull(0) as String) ?? '';
           var mail = (row.elementAtOrNull(1) as String) ?? '';
           var number = (row.elementAtOrNull(2) as String) ?? '';
           var birth = (row.elementAtOrNull(3) as String) ?? '';
-          var join = (row.elementAtOrNull(4)  as String)?? '';
+          var join = (row.elementAtOrNull(4) as String) ?? '';
           var per = (row.elementAtOrNull(5) as String) ?? '';
 
           var birthDate = DateTime.parse(birth ?? '');
           var joinDate = DateTime.parse(join ?? '');
           var permission = Parse(per);
 
-          var member = new Member(name, mail, number, birthDate, joinDate, permission);
+          var member =
+              new Member(name, mail, number, birthDate, joinDate, permission);
 
           result.add(member);
         }
@@ -91,23 +81,37 @@ class DataCenter {
     return result;
   }
 
-  Future<List<Schedule>> GetSchedules(String clubID) async{
+  Future<Schedule> GetSchedule(String clubID, String scheduleID) async
+  {
+      var schedules =  await GetSchedules(clubID);
+      var schedule = schedules.firstWhere((o) => o.id == scheduleID);
 
-    if(googleAccount == null)
-      return List.empty();
+      return schedule;
+  }
 
-    List<Schedule> result  = [];
+  Future<List<Schedule>> GetSchedules(String clubID) async {
+    if (googleAccount == null) return List.empty();
 
-    final headers = await googleAccount?.authHeaders ?? new Map<String, String>();
+    List<Schedule> result = [];
+
+    final headers =
+        await googleAccount?.authHeaders ?? new Map<String, String>();
     final authenticatedClient = GoogleHttpClient(headers);
 
     final sheetsApi = sheets.SheetsApi(authenticatedClient);
     var spreadsheetId = clubID;
-    var range = '일정!A2:G';
+    var sheetName = '일정';
 
     try {
-
       var sheets = sheetsApi.spreadsheets;
+
+      final spreadsheet = await sheetsApi.spreadsheets.get(spreadsheetId);
+      final sheet = spreadsheet.sheets!
+          .firstWhere((sheet) => sheet.properties!.title == sheetName);
+      final int rowCount = sheet.properties!.gridProperties!.rowCount!;
+
+      final range = '$sheetName!A2:G$rowCount';
+
       var response = await sheets.values.get(spreadsheetId, range);
       var values = response.values;
 
@@ -119,7 +123,7 @@ class DataCenter {
           var desc = (row.elementAtOrNull(3) as String) ?? '';
           var location = (row.elementAtOrNull(4) as String) ?? '';
           var content = (row.elementAtOrNull(5) as String) ?? '';
-          var membersStr = (row.elementAtOrNull(6)  as String)?? '';
+          var membersStr = (row.elementAtOrNull(6) as String) ?? '';
 
           var date = DateTime.parse(dateStr ?? '');
           var members = membersStr.split(',').map((o) => o.trim()).toList();
@@ -134,40 +138,168 @@ class DataCenter {
     return result;
   }
 
-  List<Club> GetClubs(){
+  List<Club> GetClubs() {
     return clubs;
-  } 
+  }
 
-  Club GetClub(String clubID){
+  Club GetClub(String clubID) {
     return clubs.firstWhere((c) => c.id == clubID);
   }
 
-  List<Due> GetDues(String clubID, String mailAddress){
-    List<Due> dues= [
-      new Due(new DateTime(2024, 7, 1), true),
-      new Due(new DateTime(2024, 8, 1), false),
-      new Due(new DateTime(2024, 9, 1), true),
-    ];
+  Future<List<Due>> GetDues(String clubID, String mailAddress) async {
+    if (googleAccount == null) return List.empty();
 
-    return dues;
+    List<Due> result = [];
+
+    final headers =
+        await googleAccount?.authHeaders ?? new Map<String, String>();
+    final authenticatedClient = GoogleHttpClient(headers);
+
+    final sheetsApi = sheets.SheetsApi(authenticatedClient);
+    var spreadsheetId = clubID;
+    var sheetName = '회비';
+
+    try {
+      var sheets = sheetsApi.spreadsheets;
+
+      final spreadsheet = await sheetsApi.spreadsheets.get(spreadsheetId);
+      final sheet = spreadsheet.sheets!
+          .firstWhere((sheet) => sheet.properties!.title == sheetName);
+      final int rowCount = sheet.properties!.gridProperties!.rowCount!;
+      final int columnCount = sheet.properties!.gridProperties!.columnCount!;
+
+      final range = '$sheetName!A1:${columnLetter(columnCount)}$rowCount';
+
+      var response = await sheets.values.get(spreadsheetId, range);
+      var values = response.values;
+
+      if (values != null) {
+        List<Object?> headers = values.elementAtOrNull(0) ?? List.empty();
+
+        for (var row in values) {
+          var name = (row.elementAtOrNull(0) as String) ?? '';
+
+          if (name == account.name) {
+            for (int j = 1; j < columnCount; j++) {
+              var dateStr = (headers[j] as String) ?? '';
+              var value = (row[j] as String) ?? '';
+              var date = DateTime.parse(dateStr ?? '');
+              var due = new Due(date, value == '납부');
+
+              result.add(due);
+            }
+          }
+        }
+      }
+    } catch (e) {}
+
+    return result;
   }
 
-  Future<DateTime> GetJoinTime(String clubId) async{
-    
+  Future<DateTime> GetJoinTime(String clubId) async {
     var time = await GetMembers(clubId);
     return time.firstWhere((m) => m.mailAddress == account.mailAddress).created;
-
   }
 
-  void Absent(String scheduleID, String mailAddress){
-    var schedule = schedules.firstWhere((s) =>  s.id == scheduleID);
-    schedule.participantMails.remove(mailAddress);
+  Future<void> Absent(
+      String clubID, Schedule? schedule, String mailAddress) async {
+    final headers =
+        await googleAccount?.authHeaders ?? new Map<String, String>();
+    final authenticatedClient = GoogleHttpClient(headers);
+
+    final sheetsApi = sheets.SheetsApi(authenticatedClient);
+    var spreadsheetId = clubID;
+    var sheetName = '일정';
+
+    try {
+      var idx = await GetIndex(clubID, schedule?.id ?? null);
+      if (idx == -1) 
+        return;
+
+      final range = '$sheetName!A${idx}:G${idx}';
+
+      var row = schedule?.ToRowWhenRemove(mailAddress) ?? List.empty();
+      List<List<Object>> values = [];
+      values.add(row);
+
+      var valueRange = sheets.ValueRange(
+        range: range,
+        values: values,
+      );
+      await sheetsApi.spreadsheets.values
+          .update(valueRange, spreadsheetId, range, valueInputOption: 'RAW');
+    } catch (e) {}
   }
 
-  
-  void Attend(String scheduleID, String mailAddress){
-    var schedule = schedules.firstWhere((s) =>  s.id == scheduleID);
-    schedule.participantMails.add(mailAddress);
+  Future<void> Attend(
+      String clubID, Schedule? schedule, String mailAddress) async {
+    final headers =
+        await googleAccount?.authHeaders ?? new Map<String, String>();
+    final authenticatedClient = GoogleHttpClient(headers);
+
+    final sheetsApi = sheets.SheetsApi(authenticatedClient);
+    var spreadsheetId = clubID;
+    var sheetName = '일정';
+
+    try {
+    var idx = await GetIndex(clubID, schedule?.id ?? null);
+      if (idx == -1) 
+        return;
+
+      final range = '$sheetName!A${idx}:G${idx}';
+
+      var row = schedule?.ToRowWhenAdd(mailAddress) ?? List.empty();
+      List<List<Object>> values = [];
+      values.add(row);
+
+      var valueRange = sheets.ValueRange(
+        range: range,
+        values: values,
+      );
+      await sheetsApi.spreadsheets.values
+          .update(valueRange, spreadsheetId, range, valueInputOption: 'RAW');
+    } catch (e) {}
+  }
+
+  Future<int> GetIndex(String clubID, String? scheduleID) async{
+    if (scheduleID == null || googleAccount == null) 
+      return -1;
+
+    final headers = await googleAccount?.authHeaders ?? new Map<String, String>();
+    final authenticatedClient = GoogleHttpClient(headers);
+
+    final sheetsApi = sheets.SheetsApi(authenticatedClient);
+    var spreadsheetId = clubID;
+    var sheetName = '일정';
+
+    try {
+      var sheets = sheetsApi.spreadsheets;
+
+      final spreadsheet = await sheetsApi.spreadsheets.get(spreadsheetId);
+      final sheet = spreadsheet.sheets!
+          .firstWhere((sheet) => sheet.properties!.title == sheetName);
+      final int rowCount = sheet.properties!.gridProperties!.rowCount!;
+
+      final range = '$sheetName!A2:G$rowCount';
+
+      var response = await sheets.values.get(spreadsheetId, range);
+      var values = response.values;
+
+      if (values != null) {
+        int idx = 2;
+
+        for (var row in values) {
+          var id = (row.elementAtOrNull(0) as String) ?? '';
+
+          if(id == scheduleID)
+            return idx;
+
+          idx++;
+        }
+      }
+    } catch (e) {}
+
+    return -1;
   }
 
   static Permission Parse(String permission) {
@@ -183,5 +315,15 @@ class DataCenter {
       default:
         throw Exception('Unknown permission: $permission');
     }
+  }
+
+  String columnLetter(int columnNumber) {
+    String columnLetter = '';
+    while (columnNumber > 0) {
+      final int remainder = (columnNumber - 1) % 26;
+      columnLetter = String.fromCharCode(65 + remainder) + columnLetter;
+      columnNumber = (columnNumber - remainder - 1) ~/ 26;
+    }
+    return columnLetter;
   }
 }
