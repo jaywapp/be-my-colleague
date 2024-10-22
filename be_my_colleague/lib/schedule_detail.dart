@@ -106,6 +106,35 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
             setState(() { });
           });
   }
+
+  Widget CreateNaverMap(
+    Completer<NaverMapController> completer, double lat,
+    double lng, String text) {
+    return NaverMap(
+      options: NaverMapViewOptions(
+          initialCameraPosition: NCameraPosition(
+            target: NLatLng(lat, lng),
+            zoom: 15,
+            bearing: 0,
+            tilt: 0,
+          ),
+          indoorEnable: true, // 실내 맵 사용 가능 여부 설정
+          locationButtonEnable: false, // 위치 버튼 표시 여부 설정
+          consumeSymbolTapEvents: false, // 심볼 탭 이벤트 소비 여부 설정
+          liteModeEnable: true),
+      onMapReady: (controller) async {
+        // 지도 준비 완료 시 호출되는 콜백 함수
+        completer.complete(controller); // Completer에 지도 컨트롤러 완료 신호 전송
+
+        var marker = NMarker(id: '1', position: NLatLng(lat, lng));
+
+        controller.addOverlay(marker);
+        final onMarkerInfoWindow =
+            NInfoWindow.onMarker(id: marker.info.id, text: text);
+        marker.openInfoWindow(onMarkerInfoWindow);
+      },
+    );
+  }
   
   Widget CreateMap(String location) {
     final Completer<NaverMapController> mapControllerCompleter = Completer();
@@ -115,49 +144,32 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
 
     return Container(
       child: FutureBuilder(
-          future: MapService.getLatLngFromAddress(location),
+          future: GetLatLng(location),
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              var latStr = snapshot.data?.values?.elementAt(0) ?? '0';
-              var lngStr = snapshot.data?.values?.elementAt(1) ?? '0';
-
-              double lat = double.parse(latStr);
-              double lng = double.parse(lngStr);
-
-              return SizedBox(
-                  width: screenWidth,
-                  height: screenHeight / 4,
-                  child: NaverMap(
-                    options: NaverMapViewOptions(
-                        initialCameraPosition: NCameraPosition(
-                          target: NLatLng(lat, lng),
-                          zoom: 15,
-                          bearing: 0,
-                          tilt: 0,
-                        ),
-                        indoorEnable: true, // 실내 맵 사용 가능 여부 설정
-                        locationButtonEnable: false, // 위치 버튼 표시 여부 설정
-                        consumeSymbolTapEvents: false, // 심볼 탭 이벤트 소비 여부 설정
-                        liteModeEnable: true),
-                    onMapReady: (controller) async {
-                      // 지도 준비 완료 시 호출되는 콜백 함수
-                      mapControllerCompleter
-                          .complete(controller); // Completer에 지도 컨트롤러 완료 신호 전송
-
-                      var marker =
-                          NMarker(id: '1', position: NLatLng(lat, lng));
-
-                      controller.addOverlay(marker);
-                      final onMarkerInfoWindow = NInfoWindow.onMarker(
-                          id: marker.info.id, text: location);
-                      marker.openInfoWindow(onMarkerInfoWindow);
-                    },
-                  ));
-            } else {
-              return Flexible(flex: 1, child: Text('지도 로드에 실패하였습니다'));
-            }
+            return SizedBox(
+                width: screenWidth,
+                height: screenHeight / 4,
+                child: snapshot.connectionState == ConnectionState.done
+                    ? CreateNaverMap(
+                        mapControllerCompleter,
+                        snapshot.data?.$1 ?? 0,
+                        snapshot.data?.$2 ?? 0,
+                        location)
+                    : Flexible(flex: 1, child: Text('지도 로드에 실패하였습니다')));
           }),
     );
+  }
+
+  Future<(double, double)> GetLatLng(String location) async {
+    var result = await MapService.getLatLngFromAddress(location);
+
+    var latStr = result?.values?.elementAt(0) ?? '0';
+    var lngStr = result?.values?.elementAt(1) ?? '0';
+
+    double lat = double.parse(latStr);
+    double lng = double.parse(lngStr);
+
+    return (lat, lng);
   }
 
   Widget CreateParticipants(
