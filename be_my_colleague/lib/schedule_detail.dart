@@ -108,24 +108,29 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
   }
   
   Widget CreateMap(String location) {
-    final Completer<NaverMapController> mapControllerCompleter = Completer();
-
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-
     return Container(
       child: FutureBuilder(
           future: GetLatLng(location),
           builder: (context, snapshot) {
-            return SizedBox(
-                width: screenWidth,
-                height: screenHeight / 4,
-                 child: snapshot.connectionState == ConnectionState.done
-                  ? CreateNaverMap(mapControllerCompleter, snapshot.data?.$1 ?? 0, snapshot.data?.$2 ?? 0, location)
-                  : Flexible(flex: 1, child: Text('지도 로드에 실패하였습니다'))
-            );
+            return CreateSizeBoxMap(snapshot.data?.$1 ?? 0, snapshot.data?.$2 ?? 0, location);
           }),
     );
+  }
+
+  Widget CreateSizeBoxMap(double lat, double lng, String location) {
+    final Completer<NaverMapController> mapControllerCompleter = Completer();
+
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isValid = lat != 0 && lng != 0;
+
+    return SizedBox(
+        width: screenWidth,
+        height: screenHeight / 4,
+        child: isValid
+            ? CreateNaverMap(
+                mapControllerCompleter, lat, lng, location)
+            : Flexible(flex: 1, child: Text('지도 로드에 실패하였습니다')));
   }
 
   Future<(double, double)> GetLatLng(String location) async {
