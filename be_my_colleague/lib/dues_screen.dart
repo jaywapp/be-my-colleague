@@ -20,15 +20,11 @@ class DuesScreen extends StatefulWidget {
 class DuesScreenState extends State<DuesScreen> {
 
   Club _club = new Club('','', '', new DateTime(1000, 1, 1,), 1, '', '');
-  List<Due> _dues = [];
 
   @override
   void initState() {
     super.initState();
     _club = widget.dataCenter.GetClub(widget.clubID);
-    _dues = widget.dataCenter.GetDues(widget.clubID, widget.dataCenter.account.mailAddress);
-    _dues.sort((a, b) => a.date.compareTo(b.date));
-    _dues = List.from(_dues.reversed);
   }
 
   @override
@@ -43,17 +39,30 @@ class DuesScreenState extends State<DuesScreen> {
         children: [
           DuesBankBlock(name: _club.bankName, account: _club.bankAccount,),
           Expanded(
-              child: ListView.builder(
-                itemCount: _dues.length,
-                itemBuilder: (BuildContext ctx, int index) {
-                  return 
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    child: DueBlock(due: _dues[index]));
-            },
-          ))
+              child: FutureBuilder(
+                future: widget.dataCenter.GetDues(widget.clubID, widget.dataCenter.account.mailAddress), 
+                builder: (context, snapshot) {
+                  var dues = snapshot?.data ?? List.empty();
+                  dues.sort((a, b) => a.date.compareTo(b.date));
+                  dues = List.from(dues.reversed);
+
+                  return CreateListView(dues);
+                })
+          ),
         ],
-      ),
+      )
+    );
+  }
+  
+
+  Widget CreateListView(List<Due>? dues) {
+    return ListView.builder(
+      itemCount: dues?.length ?? 0,
+      itemBuilder: (BuildContext ctx, int index) {
+        return Padding(
+            padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child: DueBlock(due: dues?.elementAtOrNull(index)));
+      },
     );
   }
 }

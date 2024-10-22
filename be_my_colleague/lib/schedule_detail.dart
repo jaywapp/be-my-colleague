@@ -11,6 +11,7 @@ import 'package:be_my_colleague/model/schedule.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
+import 'package:googleapis/iam/v1.dart';
 
 class ScheduleDetail extends StatefulWidget {
   final DataCenter dataCenter;
@@ -26,6 +27,7 @@ class ScheduleDetail extends StatefulWidget {
   @override
   State<ScheduleDetail> createState() => _ScheduleDetailState();
 }
+
 
 class _ScheduleDetailState extends State<ScheduleDetail> {
 
@@ -45,11 +47,12 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
   }
 
   Future<(Schedule, List<Member>)> GetData() async{
-    var schedules =  await widget.dataCenter.GetSchedules(widget.clubID);
-    var schedule = schedules.firstWhere((o) => o.id == widget.scheduleID);
-    var members = await widget.dataCenter.GetMembers(widget.clubID);
 
-    return (schedule, members);
+    List results =  await Future.wait([
+      widget.dataCenter.GetSchedule(widget.clubID, widget.scheduleID),
+      widget.dataCenter.GetMembers(widget.clubID),]);
+
+    return (results[0] as Schedule, results[1] as List<Member>);
   }
 
   Widget CreateWidget(Schedule? schedule, List<Member>? members){
@@ -58,6 +61,7 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
         body : CreatePadding(schedule, members),
         floatingActionButton:  CreateFloatingButton(schedule),
       );
+
   }
 
   Widget CreatePadding(Schedule? schedule, List<Member>? members){
@@ -92,17 +96,17 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
           label: Text(include ? '이번 일정은 불참합니다.' : '이번 일정은 참석합니다.'),
           backgroundColor: include ? Colors.red : Colors.blue,
           foregroundColor: include ? Colors.black : Colors.white,
-          onPressed: () {
+          onPressed: () async {
             if (include) {
-              widget.dataCenter.Absent(schedule?.id ?? '', widget.dataCenter.account.mailAddress);
+              await widget.dataCenter.Absent(widget.clubID, schedule,  widget.dataCenter.account.mailAddress);
             } else {
-              widget.dataCenter.Attend(schedule?.id ?? '', widget.dataCenter.account.mailAddress);
+              await widget.dataCenter.Attend(widget.clubID, schedule,  widget.dataCenter.account.mailAddress);
             }
 
             setState(() { });
           });
   }
-
+  
   Widget CreateMap(String location) {
     final Completer<NaverMapController> mapControllerCompleter = Completer();
 
