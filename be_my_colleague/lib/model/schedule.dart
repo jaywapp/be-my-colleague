@@ -13,6 +13,19 @@ class Schedule {
   Schedule(this.id, this.name, this.description, this.location, this.dateTime,
       this.content, this.participantMails);
 
+  Schedule.FromRow(List<Object?> row) {
+    this.id = (row.elementAtOrNull(0) as String) ?? '';
+    var dateStr = (row.elementAtOrNull(1) as String) ?? '';
+    this.name = (row.elementAtOrNull(2) as String) ?? '';
+    this.description = (row.elementAtOrNull(3) as String) ?? '';
+    this.location = (row.elementAtOrNull(4) as String) ?? '';
+    this.content = (row.elementAtOrNull(5) as String) ?? '';
+    var membersStr = (row.elementAtOrNull(6) as String) ?? '';
+
+    this.dateTime = DateTime.parse(dateStr ?? '');
+    this.participantMails = membersStr.split(',').map((o) => o.trim()).toList();
+  }
+
   List<Object> ToRowWhenRemove(String remove) {
     List<Object> row = [];
 

@@ -5,4 +5,10 @@ class Due {
   bool payed = false;
 
   Due(this.date, this.payed);
+
+  // Due.FromRow(List<Object?> row){
+  //    var dateStr = (headers[j] as String) ?? '';
+  //             var value = (row[j] as String) ?? '';
+  //             var date = DateTime.parse(dateStr ?? '');
+  // }
 }

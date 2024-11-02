@@ -11,18 +11,16 @@ class Member {
 
   Member(this.name, this.mailAddress, this.phoneNumber, this.birth, this.created, this.permission);
 
-  static Permission convert(String permission) {
-    switch (permission) {
-      case 'president':
-        return Permission.president;
-      case 'vicePresident':
-        return Permission.vicePresident;
-      case 'secretary':
-        return Permission.secretary;
-      case 'normal':
-        return Permission.normal;
-      default:
-        throw Exception('Unknown permission: $permission');
-    }
+  Member.FromRow(List<Object?> row) {
+    this.name = (row.elementAtOrNull(0) as String) ?? '';
+    this.mailAddress = (row.elementAtOrNull(1) as String) ?? '';
+    this.phoneNumber = (row.elementAtOrNull(2) as String) ?? '';
+    var birthStr = (row.elementAtOrNull(3) as String) ?? '';
+    var joinStr = (row.elementAtOrNull(4) as String) ?? '';
+    var perStr = (row.elementAtOrNull(5) as String) ?? '';
+
+    this.birth = DateTime.parse(birthStr ?? '');
+    this.created = DateTime.parse(joinStr ?? '');
+    this.permission = PermissionExt.Parse(perStr);
   }
 }
