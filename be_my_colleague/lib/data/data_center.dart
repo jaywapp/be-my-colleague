@@ -1,15 +1,9 @@
-import 'package:be_my_colleague/Service/GoogleHttpClient.dart';
 import 'package:be_my_colleague/model/due.dart';
 import 'package:be_my_colleague/model/member.dart';
 import 'package:be_my_colleague/model/account.dart';
 import 'package:be_my_colleague/model/club.dart';
-import 'package:be_my_colleague/model/enums.dart';
 import 'package:be_my_colleague/model/schedule.dart';
 import 'package:be_my_colleague/submodules/jaywapp-dart-google-sheet/google-sheet-manager.dart';
-import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:googleapis/sheets/v4.dart' as sheets;
 import 'package:google_sign_in/google_sign_in.dart';
 
 class DataCenter {
@@ -92,9 +86,8 @@ class DataCenter {
 
           if (name == account.name) {
             for (int j = 1; j < length; j++) {
-              var due = new Due(
-                DateTime.parse((headers[j] as String) ?? ''), 
-                (row[j] as String) == '납부');
+              var due = new Due(DateTime.parse((headers[j] as String) ?? ''),
+                  (row[j] as String) == '납부');
 
               result.add(due);
             }
@@ -106,6 +99,32 @@ class DataCenter {
     return result;
   }
 
+  Future<void> Absent(
+      String clubID, Schedule? schedule, String mailAddress) async {
+    var manager = new GoogleSheetManager(googleAccount, clubID);
+    var sheetName = '일정';
+
+    try {
+      var idx = await manager.GetIndex(sheetName, 1, schedule?.id);
+      if (idx == -1) return;
+      var row = schedule?.ToRowWhenRemove(mailAddress) ?? List.empty();
+      await manager.Update(sheetName, idx, row);
+    } catch (e) {}
+  }
+
+  Future<void> Attend(
+      String clubID, Schedule? schedule, String mailAddress) async {
+    var manager = new GoogleSheetManager(googleAccount, clubID);
+    var sheetName = '일정';
+
+    try {
+      var idx = await manager.GetIndex(sheetName, 1, schedule?.id);
+      if (idx == -1) return;
+      var row = schedule?.ToRowWhenAdd(mailAddress) ?? List.empty();
+      await manager.Update(sheetName, idx, row);
+    } catch (e) {}
+  }
+
   List<Club> GetClubs() {
     return clubs;
   }
@@ -113,7 +132,7 @@ class DataCenter {
   Club GetClub(String clubID) {
     return clubs.firstWhere((c) => c.id == clubID);
   }
-  
+
   Future<Schedule> GetSchedule(String clubID, String scheduleID) async {
     var schedules = await GetSchedules(clubID);
     var schedule = schedules.firstWhere((o) => o.id == scheduleID);
@@ -124,128 +143,5 @@ class DataCenter {
   Future<DateTime> GetJoinTime(String clubId) async {
     var time = await GetMembers(clubId);
     return time.firstWhere((m) => m.mailAddress == account.mailAddress).created;
-  }
-
-  Future<void> Absent(
-      String clubID, Schedule? schedule, String mailAddress) async {
-    final headers =
-        await googleAccount?.authHeaders ?? new Map<String, String>();
-    final authenticatedClient = GoogleHttpClient(headers);
-
-    final sheetsApi = sheets.SheetsApi(authenticatedClient);
-    var spreadsheetId = clubID;
-    var sheetName = '일정';
-
-    try {
-      var idx = await GetIndex(clubID, schedule?.id ?? null);
-      if (idx == -1) return;
-
-      final range = '$sheetName!A${idx}:G${idx}';
-
-      var row = schedule?.ToRowWhenRemove(mailAddress) ?? List.empty();
-      List<List<Object>> values = [];
-      values.add(row);
-
-      var valueRange = sheets.ValueRange(
-        range: range,
-        values: values,
-      );
-      await sheetsApi.spreadsheets.values
-          .update(valueRange, spreadsheetId, range, valueInputOption: 'RAW');
-    } catch (e) {}
-  }
-
-  Future<void> Attend(
-      String clubID, Schedule? schedule, String mailAddress) async {
-    final headers =
-        await googleAccount?.authHeaders ?? new Map<String, String>();
-    final authenticatedClient = GoogleHttpClient(headers);
-
-    final sheetsApi = sheets.SheetsApi(authenticatedClient);
-    var spreadsheetId = clubID;
-    var sheetName = '일정';
-
-    try {
-      var idx = await GetIndex(clubID, schedule?.id ?? null);
-      if (idx == -1) return;
-
-      final range = '$sheetName!A${idx}:G${idx}';
-
-      var row = schedule?.ToRowWhenAdd(mailAddress) ?? List.empty();
-      List<List<Object>> values = [];
-      values.add(row);
-
-      var valueRange = sheets.ValueRange(
-        range: range,
-        values: values,
-      );
-      await sheetsApi.spreadsheets.values
-          .update(valueRange, spreadsheetId, range, valueInputOption: 'RAW');
-    } catch (e) {}
-  }
-
-  Future<int> GetIndex(String clubID, String? scheduleID) async {
-    if (scheduleID == null || googleAccount == null) return -1;
-
-    final headers =
-        await googleAccount?.authHeaders ?? new Map<String, String>();
-    final authenticatedClient = GoogleHttpClient(headers);
-
-    final sheetsApi = sheets.SheetsApi(authenticatedClient);
-    var spreadsheetId = clubID;
-    var sheetName = '일정';
-
-    try {
-      var sheets = sheetsApi.spreadsheets;
-
-      final spreadsheet = await sheetsApi.spreadsheets.get(spreadsheetId);
-      final sheet = spreadsheet.sheets!
-          .firstWhere((sheet) => sheet.properties!.title == sheetName);
-      final int rowCount = sheet.properties!.gridProperties!.rowCount!;
-
-      final range = '$sheetName!A2:G$rowCount';
-
-      var response = await sheets.values.get(spreadsheetId, range);
-      var values = response.values;
-
-      if (values != null) {
-        int idx = 2;
-
-        for (var row in values) {
-          var id = (row.elementAtOrNull(0) as String) ?? '';
-
-          if (id == scheduleID) return idx;
-
-          idx++;
-        }
-      }
-    } catch (e) {}
-
-    return -1;
-  }
-
-  static Permission Parse(String permission) {
-    switch (permission) {
-      case 'president':
-        return Permission.president;
-      case 'vicePresident':
-        return Permission.vicePresident;
-      case 'secretary':
-        return Permission.secretary;
-      case 'normal':
-        return Permission.normal;
-      default:
-        throw Exception('Unknown permission: $permission');
-    }
-  }
-
-  String columnLetter(int columnNumber) {
-    String columnLetter = '';
-    while (columnNumber > 0) {
-      final int remainder = (columnNumber - 1) % 26;
-      columnLetter = String.fromCharCode(65 + remainder) + columnLetter;
-      columnNumber = (columnNumber - remainder - 1) ~/ 26;
-    }
-    return columnLetter;
   }
 }
