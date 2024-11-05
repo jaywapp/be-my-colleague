@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:be_my_colleague/Service/MapService.dart';
 import 'package:be_my_colleague/Styles.dart';
 import 'package:be_my_colleague/data/data_center.dart';
+import 'package:be_my_colleague/indicator.dart';
 import 'package:be_my_colleague/model/member.dart';
 import 'package:be_my_colleague/model/account.dart';
 import 'package:be_my_colleague/model/club.dart';
@@ -28,10 +29,7 @@ class ScheduleDetail extends StatefulWidget {
   State<ScheduleDetail> createState() => _ScheduleDetailState();
 }
 
-
 class _ScheduleDetailState extends State<ScheduleDetail> {
-
-
   @override
   void initState() {
     super.initState();
@@ -40,79 +38,85 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: GetData(), 
-      builder: (context, snapshot){
-        return CreateWidget(snapshot?.data?.$1, snapshot?.data?.$2);
-      });
+        future: GetData(),
+        builder: (context, snapshot) {
+          return CreateWidget(snapshot?.data?.$1, snapshot?.data?.$2);
+        });
   }
 
-  Future<(Schedule, List<Member>)> GetData() async{
-
-    List results =  await Future.wait([
+  Future<(Schedule, List<Member>)> GetData() async {
+    List results = await Future.wait([
       widget.dataCenter.GetSchedule(widget.clubID, widget.scheduleID),
-      widget.dataCenter.GetMembers(widget.clubID),]);
+      widget.dataCenter.GetMembers(widget.clubID),
+    ]);
 
     return (results[0] as Schedule, results[1] as List<Member>);
   }
 
-  Widget CreateWidget(Schedule? schedule, List<Member>? members){
-      return Scaffold(
-        appBar: AppBar(title: Text(schedule?.name ?? '')),
-        body : CreatePadding(schedule, members),
-        floatingActionButton:  CreateFloatingButton(schedule),
-      );
-
+  Widget CreateWidget(Schedule? schedule, List<Member>? members) {
+    return Scaffold(
+      appBar: AppBar(title: Text(schedule?.name ?? '')),
+      body: CreatePadding(schedule, members),
+      floatingActionButton: CreateFloatingButton(schedule),
+    );
   }
 
-  Widget CreatePadding(Schedule? schedule, List<Member>? members){
-
+  Widget CreatePadding(Schedule? schedule, List<Member>? members) {
     var targets = (members ?? List.empty())
-        .where((member) => schedule?.participantMails?.contains(member.mailAddress) ?? false)
+        .where((member) =>
+            schedule?.participantMails?.contains(member.mailAddress) ?? false)
         .toList();
 
     return Padding(
-        padding: EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 12.0),
-        child: Column(
-          children: [
-            Styles.CreateHeader(Icons.access_time, '언제'),
-            Styles.CreateContent(convert(schedule?.dateTime ?? new DateTime(1000))),
-            Styles.CreateHeader(Icons.map_outlined, '어디서'),
-            Styles.CreateContent(schedule?.location ?? ''),
-            CreateMap(schedule?.location ?? ''),
-            Styles.CreateHeader(Icons.question_mark, '무엇을'),
-            Styles.CreateContent(schedule?.content ?? ''),
-            Styles.CreateHeader(Icons.supervised_user_circle, '누가'),
-            CreateParticipants(context,  widget.dataCenter.account, targets),
-          ],
-        ),
-      );
+      padding: EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 12.0),
+      child: Column(
+        children: [
+          Styles.CreateHeader(Icons.access_time, '언제'),
+          Styles.CreateContent(
+              convert(schedule?.dateTime ?? new DateTime(1000))),
+          Styles.CreateHeader(Icons.map_outlined, '어디서'),
+          Styles.CreateContent(schedule?.location ?? ''),
+          CreateMap(schedule?.location ?? ''),
+          Styles.CreateHeader(Icons.question_mark, '무엇을'),
+          Styles.CreateContent(schedule?.content ?? ''),
+          Styles.CreateHeader(Icons.supervised_user_circle, '누가'),
+          CreateParticipants(context, widget.dataCenter.account, targets),
+        ],
+      ),
+    );
   }
 
-  Widget CreateFloatingButton(Schedule? schedule){
-    var include = schedule?.participantMails?.contains(widget.dataCenter.account.mailAddress) ?? false;
+  Widget CreateFloatingButton(Schedule? schedule) {
+    var include = schedule?.participantMails
+            ?.contains(widget.dataCenter.account.mailAddress) ??
+        false;
 
     return FloatingActionButton.extended(
-          icon: include ? const Icon(Icons.cancel) : const Icon(Icons.check),
-          label: Text(include ? '이번 일정은 불참합니다.' : '이번 일정은 참석합니다.'),
-          backgroundColor: include ? Colors.red : Colors.blue,
-          foregroundColor: include ? Colors.black : Colors.white,
-          onPressed: () async {
-            if (include) {
-              await widget.dataCenter.Absent(widget.clubID, schedule,  widget.dataCenter.account.mailAddress);
-            } else {
-              await widget.dataCenter.Attend(widget.clubID, schedule,  widget.dataCenter.account.mailAddress);
-            }
+        icon: include ? const Icon(Icons.cancel) : const Icon(Icons.check),
+        label: Text(include ? '이번 일정은 불참합니다.' : '이번 일정은 참석합니다.'),
+        backgroundColor: include ? Colors.red : Colors.blue,
+        foregroundColor: include ? Colors.black : Colors.white,
+        onPressed: () async {
+          if (include) {
+            await widget.dataCenter.Absent(
+                widget.clubID, schedule, widget.dataCenter.account.mailAddress);
+          } else {
+            await widget.dataCenter.Attend(
+                widget.clubID, schedule, widget.dataCenter.account.mailAddress);
+          }
 
-            setState(() { });
-          });
+          setState(() {});
+        });
   }
-  
+
   Widget CreateMap(String location) {
     return Container(
       child: FutureBuilder(
           future: GetLatLng(location),
           builder: (context, snapshot) {
-            return CreateSizeBoxMap(snapshot.data?.$1 ?? 0, snapshot.data?.$2 ?? 0, location);
+            
+              return CreateSizeBoxMap(
+                  snapshot.data?.$1 ?? 0, snapshot.data?.$2 ?? 0, location);
           }),
     );
   }
@@ -128,9 +132,8 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
         width: screenWidth,
         height: screenHeight / 4,
         child: isValid
-            ? CreateNaverMap(
-                mapControllerCompleter, lat, lng, location)
-            : Flexible(flex: 1, child: Text('지도 로드에 실패하였습니다')));
+            ? CreateNaverMap(mapControllerCompleter, lat, lng, location)
+            : Flexible(flex: 1, child: Text('표시할 정보가 없습니다.')));
   }
 
   Future<(double, double)> GetLatLng(String location) async {
@@ -145,8 +148,7 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
     return (lat, lng);
   }
 
-  Widget CreateNaverMap(
-    Completer<NaverMapController> completer, double lat,
+  Widget CreateNaverMap(Completer<NaverMapController> completer, double lat,
       double lng, String text) {
     return NaverMap(
       options: NaverMapViewOptions(
