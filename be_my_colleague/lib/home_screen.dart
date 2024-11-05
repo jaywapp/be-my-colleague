@@ -14,6 +14,30 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
+  int membersCount = 0;
+  int postsCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    var club =
+        widget.dataCenter.GetClubs().firstWhere((o) => o.id == widget.clubID);
+
+    GetMemberCount(club);
+    GetPostsCount(club);
+  }
+
+  Future<void> GetMemberCount(Club club) async {
+    int count = await widget.dataCenter.GetMemberCount(club.id);
+    membersCount = count;
+  }
+
+  Future<void> GetPostsCount(Club club) async {
+    int count = await widget.dataCenter.GetPostsCount(club.id);
+    postsCount = count;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,11 +68,12 @@ class HomeScreenState extends State<HomeScreen> {
                     Container(
                       width: 80,
                       height: 50,
-                      child: Center(
-                        child: Text("총 멤버: 3명",
+                      child: Column(children: [
+                        Text("총 멤버",
                             style: TextStyle(fontSize: 16),
                             textAlign: TextAlign.center),
-                      ),
+                        Text('$membersCount'),
+                      ]),
                     ),
                     Container(
                       height: 30, // Divider의 높이를 설정
@@ -60,10 +85,13 @@ class HomeScreenState extends State<HomeScreen> {
                     Container(
                       width: 80,
                       height: 50,
-                      child: Center(
-                        child: Text("게시물: 10개",
-                            style: TextStyle(fontSize: 16),
-                            textAlign: TextAlign.center),
+                      child: Column(
+                        children: [
+                          Text("공지사항 수",
+                              style: TextStyle(fontSize: 16),
+                              textAlign: TextAlign.center),
+                          Text('$postsCount'),
+                        ],
                       ),
                     ),
                   ],
