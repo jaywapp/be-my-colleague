@@ -2,6 +2,7 @@ import 'package:be_my_colleague/Styles.dart';
 import 'package:be_my_colleague/data/data_center.dart';
 import 'package:be_my_colleague/dues_bank_block.dart';
 import 'package:be_my_colleague/dues_block.dart';
+import 'package:be_my_colleague/indicator.dart';
 import 'package:be_my_colleague/model/account.dart';
 import 'package:be_my_colleague/model/club.dart';
 import 'package:be_my_colleague/model/due.dart';
@@ -18,8 +19,18 @@ class DuesScreen extends StatefulWidget {
 }
 
 class DuesScreenState extends State<DuesScreen> {
-
-  Club _club = new Club('','', '', new DateTime(1000, 1, 1,), 1, '', '');
+  Club _club = new Club(
+      '',
+      '',
+      '',
+      new DateTime(
+        1000,
+        1,
+        1,
+      ),
+      1,
+      '',
+      '');
 
   @override
   void initState() {
@@ -29,31 +40,34 @@ class DuesScreenState extends State<DuesScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      appBar: AppBar(
-        title: Styles.CreateHeader(Icons.monetization_on_sharp , '회비납부내역'),
-      ),
-      body: Column(
+        appBar: AppBar(
+          title: Styles.CreateHeader(Icons.monetization_on_sharp, '회비납부내역'),
+        ),
+        body: Column(
+          children: [
+            DuesBankBlock(
+              name: _club.bankName,
+              account: _club.bankAccount,
+            ),
+            Expanded(
+                child: FutureBuilder(
+                    future: widget.dataCenter.GetDues(
+                        widget.clubID, widget.dataCenter.account.mailAddress),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Indicator.ShowIndicator("회비 납부 내역을 불러오는 중입니다..");
+                      } else {
+                        var dues = snapshot?.data ?? List.empty();
+                        dues.sort((a, b) => a.date.compareTo(b.date));
+                        dues = List.from(dues.reversed);
 
-        children: [
-          DuesBankBlock(name: _club.bankName, account: _club.bankAccount,),
-          Expanded(
-              child: FutureBuilder(
-                future: widget.dataCenter.GetDues(widget.clubID, widget.dataCenter.account.mailAddress), 
-                builder: (context, snapshot) {
-                  var dues = snapshot?.data ?? List.empty();
-                  dues.sort((a, b) => a.date.compareTo(b.date));
-                  dues = List.from(dues.reversed);
-
-                  return CreateListView(dues);
-                })
-          ),
-        ],
-      )
-    );
+                        return CreateListView(dues);
+                      }
+                    })),
+          ],
+        ));
   }
-  
 
   Widget CreateListView(List<Due>? dues) {
     return ListView.builder(

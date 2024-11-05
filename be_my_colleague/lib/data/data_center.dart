@@ -1,4 +1,7 @@
+import 'dart:ffi';
+
 import 'package:be_my_colleague/model/due.dart';
+import 'package:be_my_colleague/model/enums.dart';
 import 'package:be_my_colleague/model/member.dart';
 import 'package:be_my_colleague/model/account.dart';
 import 'package:be_my_colleague/model/club.dart';
@@ -12,11 +15,14 @@ class DataCenter {
   Account account = new Account('', '');
   List<Club> clubs = [];
 
+  String name = '';
+  String mailAddress = '';
+
   DataCenter(GoogleSignInAccount? googleUser) {
     googleAccount = googleUser;
 
-    var name = googleUser?.displayName ?? '';
-    var mailAddress = googleUser?.email ?? '';
+    name = googleUser?.displayName ?? '';
+    mailAddress = googleUser?.email ?? '';
 
     account = new Account(name, mailAddress);
 
@@ -24,6 +30,10 @@ class DataCenter {
       new Club('1Op1lymJ1oDr8IazasJpq3UDUtUTfysVzGsa-sJlQIPI', '경충FC',
           '풋살을 즐겁게 하자', new DateTime(2011, 08, 16), 1, '신한', '110-152-149740')
     ];
+  }
+
+  String GetMail(){
+    return googleAccount?.email ?? '';
   }
 
   Future<List<Member>> GetMembers(String clubID) async {
@@ -117,6 +127,16 @@ class DataCenter {
     return result;
   }
 
+  Future<void> AddSchdule(String clubID, Schedule schedule) async {
+    var manager = new GoogleSheetManager(googleAccount, clubID);
+    var rows = schedule.ToRow();
+
+     try {
+      await manager.Appand('일정', rows);
+     }
+     catch (e) {}
+  }
+
   Future<void> Absent(
       String clubID, Schedule? schedule, String mailAddress) async {
     var manager = new GoogleSheetManager(googleAccount, clubID);
@@ -161,5 +181,17 @@ class DataCenter {
   Future<DateTime> GetJoinTime(String clubId) async {
     var time = await GetMembers(clubId);
     return time.firstWhere((m) => m.mailAddress == account.mailAddress).created;
+  }
+
+  Future<bool> IsAdmin(String clubID) async {
+
+    var members = await GetMembers(clubID);
+    var target = members.firstWhere((m) => m.mailAddress == mailAddress);
+
+    var result = target.permission == Permission.president
+              || target.permission == Permission.vicePresident
+              || target.permission == Permission.secretary;
+
+    return result;
   }
 }
