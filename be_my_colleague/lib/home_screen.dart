@@ -37,26 +37,34 @@ class HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 10), // 여백 추가
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      width: 200,
+                      width: 80,
                       height: 50,
-                      child: Text("총 멤버: 3명",
-                          style: TextStyle(fontSize: 16),
-                          textAlign: TextAlign.center),
+                      child: Center(
+                        child: Text("총 멤버: 3명",
+                            style: TextStyle(fontSize: 16),
+                            textAlign: TextAlign.center),
+                      ),
                     ),
-                    SizedBox(width: 5),
-                    VerticalDivider(color: Colors.grey, thickness: 1.0),
-                    SizedBox(width: 5),
                     Container(
-                      width: 50,
+                      height: 30, // Divider의 높이를 설정
+                      child: VerticalDivider(
+                        color: Colors.grey,
+                        thickness: 1,
+                      ),
+                    ),
+                    Container(
+                      width: 80,
                       height: 50,
-                      child: Text("게시물: 10개",
-                          style: TextStyle(fontSize: 16),
-                          textAlign: TextAlign.center),
+                      child: Center(
+                        child: Text("게시물: 10개",
+                            style: TextStyle(fontSize: 16),
+                            textAlign: TextAlign.center),
+                      ),
                     ),
                   ],
                 ),
