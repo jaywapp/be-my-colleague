@@ -30,6 +30,9 @@ class ScheduleDetail extends StatefulWidget {
 }
 
 class _ScheduleDetailState extends State<ScheduleDetail> {
+  bool include = false; // 참석 여부를 나타내는 상태 변수
+  bool isLoading = false; // 로딩 상태를 나타내는 변수
+
   @override
   void initState() {
     super.initState();
@@ -57,7 +60,53 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
     return Scaffold(
       appBar: AppBar(title: Text(schedule?.name ?? '')),
       body: CreatePadding(schedule, members),
-      floatingActionButton: CreateFloatingButton(schedule),
+      floatingActionButton: isLoading // 로딩 중일 경우
+          ? SizedBox(
+              width: 150, // 버튼의 너비를 설정
+              child: FloatingActionButton.extended(
+                icon: SizedBox(
+                    width: 24, // 인디케이터 너비
+                    height: 24, // 인디케이터 높이
+                    child: CircularProgressIndicator(
+                      color: Colors.white, // 인디케이터 색상
+                      strokeWidth: 2.0, // 인디케이터 두께
+                    )),
+                label: Text('반영중...'), // 로딩 중 메시지
+                backgroundColor: Colors.grey, // 배경색
+                onPressed: null, // 비활성화
+              ),
+            )
+          : FloatingActionButton.extended(
+              icon:
+                  include ? const Icon(Icons.cancel) : const Icon(Icons.check),
+              label: Text(include ? '이번 일정은 불참합니다.' : '이번 일정은 참석합니다.'),
+              backgroundColor: include ? Colors.red : Colors.blue,
+              foregroundColor: include ? Colors.black : Colors.white,
+              onPressed: () async {
+                setState(() {
+                  isLoading = true; // 로딩 시작
+                });
+
+                if (include) {
+                  await widget.dataCenter.Absent(
+                    widget.clubID,
+                    schedule,
+                    widget.dataCenter.account.mailAddress,
+                  );
+                } else {
+                  await widget.dataCenter.Attend(
+                    widget.clubID,
+                    schedule,
+                    widget.dataCenter.account.mailAddress,
+                  );
+                }
+
+                setState(() {
+                  include = !include; // 참석 여부를 반전
+                  isLoading = false; // 로딩 종료
+                });
+              },
+            ),
     );
   }
 
@@ -86,37 +135,13 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
     );
   }
 
-  Widget CreateFloatingButton(Schedule? schedule) {
-    var include = schedule?.participantMails
-            ?.contains(widget.dataCenter.account.mailAddress) ??
-        false;
-
-    return FloatingActionButton.extended(
-        icon: include ? const Icon(Icons.cancel) : const Icon(Icons.check),
-        label: Text(include ? '이번 일정은 불참합니다.' : '이번 일정은 참석합니다.'),
-        backgroundColor: include ? Colors.red : Colors.blue,
-        foregroundColor: include ? Colors.black : Colors.white,
-        onPressed: () async {
-          if (include) {
-            await widget.dataCenter.Absent(
-                widget.clubID, schedule, widget.dataCenter.account.mailAddress);
-          } else {
-            await widget.dataCenter.Attend(
-                widget.clubID, schedule, widget.dataCenter.account.mailAddress);
-          }
-
-          setState(() {});
-        });
-  }
-
   Widget CreateMap(String location) {
     return Container(
       child: FutureBuilder(
           future: GetLatLng(location),
           builder: (context, snapshot) {
-            
-              return CreateSizeBoxMap(
-                  snapshot.data?.$1 ?? 0, snapshot.data?.$2 ?? 0, location);
+            return CreateSizeBoxMap(
+                snapshot.data?.$1 ?? 0, snapshot.data?.$2 ?? 0, location);
           }),
     );
   }
@@ -130,7 +155,7 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
 
     return SizedBox(
         width: screenWidth,
-        height: screenHeight / 4,
+        height: 200,
         child: isValid
             ? CreateNaverMap(mapControllerCompleter, lat, lng, location)
             : Flexible(flex: 1, child: Text('표시할 정보가 없습니다.')));
