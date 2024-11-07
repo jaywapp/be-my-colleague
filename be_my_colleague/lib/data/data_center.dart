@@ -58,6 +58,24 @@ class DataCenter {
     return result;
   }
 
+  Future<int> GetMemberCount(String clubID) async {
+    if (googleAccount == null) return 0;
+
+    var manager = new GoogleSheetManager(googleAccount, clubID);
+    var values = await manager.GetActiveValues('회원');
+
+    return values?.length ?? 0;
+  }
+
+  Future<int> GetPostsCount(String clubID) async {
+    if (googleAccount == null) return 0;
+
+    var manager = new GoogleSheetManager(googleAccount, clubID);
+    var values = await manager.GetActiveValues('공지사항');
+
+    return values?.length ?? 0;
+  }
+
   Future<List<Schedule>> GetSchedules(String clubID) async {
     if (googleAccount == null) return List.empty();
 
