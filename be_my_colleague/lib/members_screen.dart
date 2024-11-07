@@ -3,6 +3,7 @@ import 'package:be_my_colleague/data/data_center.dart';
 import 'package:be_my_colleague/indicator.dart';
 import 'package:be_my_colleague/model/account.dart';
 import 'package:be_my_colleague/model/club.dart';
+import 'package:be_my_colleague/model/enums.dart';
 import 'package:be_my_colleague/model/member.dart';
 import 'package:flutter/material.dart';
 import 'package:googleapis/androidmanagement/v1.dart';
@@ -49,10 +50,25 @@ class MembersScreenState extends State<MembersScreen> {
       itemCount: members.length,
       itemBuilder: (context, index) {
         final member = members[index];
+        Icon? badge = null;
+
+        if(member.permission == Permission.president){
+          badge = Icon(Icons.star);
+        }
+        else if(member.permission == Permission.vicePresident){
+          badge = Icon(Icons.star_half);
+        }
+        else if(member.permission == Permission.secretary){
+          badge = Icon(Icons.star_outline);
+        }
+
         return ListTile(
-          leading: Icon(Icons.account_circle),
-          title: Text(member.name, style: Styles.ContentStyle),
-          subtitle: Text('등급: ${member.permission.toString().split('.').last}'),
+          leading:  Icon(Icons.account_circle),
+          title: Row(
+            children: [
+              Text(member.name, style: Styles.ContentStyle),
+              badge ?? SizedBox.shrink(),
+          ],),
           trailing: IconButton(
             icon: Icon(Icons.phone),
             onPressed: () => _makePhoneCall(member.phoneNumber),

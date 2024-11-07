@@ -30,7 +30,6 @@ class ScheduleDetail extends StatefulWidget {
 }
 
 class _ScheduleDetailState extends State<ScheduleDetail> {
-  bool include = false; // 참석 여부를 나타내는 상태 변수
   bool isLoading = false; // 로딩 상태를 나타내는 변수
 
   @override
@@ -57,6 +56,9 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
   }
 
   Widget CreateWidget(Schedule? schedule, List<Member>? members) {
+
+    var include = schedule?.participantMails?.contains(widget.dataCenter.mailAddress) ?? false;
+
     return Scaffold(
       appBar: AppBar(title: Text(schedule?.name ?? '')),
       body: CreatePadding(schedule, members),
@@ -102,7 +104,6 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
                 }
 
                 setState(() {
-                  include = !include; // 참석 여부를 반전
                   isLoading = false; // 로딩 종료
                 });
               },
@@ -120,15 +121,12 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
       padding: EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 12.0),
       child: Column(
         children: [
-          Styles.CreateHeader(Icons.access_time, '언제'),
-          Styles.CreateContent(
-              convert(schedule?.dateTime ?? new DateTime(1000))),
-          Styles.CreateHeader(Icons.map_outlined, '어디서'),
+          Styles.CreateHeader(Icons.access_time, '날짜/시간'),
+          Styles.CreateContent(convert(schedule?.dateTime ?? new DateTime(1000))),
+          Styles.CreateHeader(Icons.map_outlined, '장소'),
           Styles.CreateContent(schedule?.location ?? ''),
           CreateMap(schedule?.location ?? ''),
-          Styles.CreateHeader(Icons.question_mark, '무엇을'),
-          Styles.CreateContent(schedule?.content ?? ''),
-          Styles.CreateHeader(Icons.supervised_user_circle, '누가'),
+          Styles.CreateHeader(Icons.supervised_user_circle, '참여인원 (${schedule?.participantMails?.length ?? 0} / ${members?.length ?? 0})'),
           CreateParticipants(context, widget.dataCenter.account, targets),
         ],
       ),
@@ -137,6 +135,7 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
 
   Widget CreateMap(String location) {
     return Container(
+      height: 200,
       child: FutureBuilder(
           future: GetLatLng(location),
           builder: (context, snapshot) {
@@ -203,11 +202,19 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
 
   Widget CreateParticipants(
       BuildContext context, Account account, List<Member> members) {
+    List<Member> targets = [];
+
+    for (var member in members) {
+      targets.add(member);
+    }
+
+    targets.sort((a, b) => a.name.compareTo(b.name));
+
     return Expanded(
       child: ListView.builder(
-          itemCount: members.length,
+          itemCount: targets.length,
           itemBuilder: (BuildContext ctx, int index) {
-            var member = members[index];
+            var member = targets[index];
             var color = member.mailAddress == account.mailAddress
                 ? Theme.of(context).colorScheme.primary
                 : Colors.black;

@@ -25,8 +25,22 @@ class Schedule {
 
     this.dateTime = DateTime.parse(dateStr ?? '');
 
-    if(membersStr.length > 0)
-      this.participantMails = membersStr.split(',').map((o) => o.trim()).toList();
+    List<String> mails = [];
+
+    if(membersStr.isNotEmpty){
+      if(membersStr.contains(',')){
+        var splits = membersStr.split(',').map((o) => o.trim()).toList();
+
+        for(var split in splits){
+          mails.add(split);
+        }
+      }
+      else{
+        mails.add(membersStr);
+      }
+    }
+    
+    this.participantMails = mails;
   }
 
   String ConvertToString(Object? obj) {
@@ -93,7 +107,7 @@ class Schedule {
   List<Object> ToRowWhenAdd(String add) {
     List<Object> row = [];
     row.add(id);
-    row.add('${dateTime.year}-${dateTime.month}-${dateTime.day}');
+    row.add(DateFormat('yyyy-MM-dd').format(dateTime));
     row.add(name);
     row.add(description);
     row.add(location);
@@ -110,7 +124,9 @@ class Schedule {
       }
     }
 
-    result += ', ';
+    if(targets.length > 0)
+      result += ', ';
+
     result += add;
 
     row.add(result);
